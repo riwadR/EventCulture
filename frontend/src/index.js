@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import { BrowserRouter, Routes, Route } from 'react-router';
-import Formulaire from './components/Formulaire';
-import Navbar from './components/Navbar';
+import Formulaire from './pages/Formulaire/Formulaire';
+import Navbar from './components/Navbar/Navbar';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 

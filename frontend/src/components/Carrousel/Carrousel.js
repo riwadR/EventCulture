@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import './Carrousel.css';
 
-import img1 from '../img/Carrousel/img1.jpeg';
-import img2 from '../img/Carrousel/img2.jpg';
-import img3 from '../img/Carrousel/img3.jpg';
-import img4 from '../img/Carrousel/img4.jpg';
-import img5 from '../img/Carrousel/img5.jpg';
+import img1 from '../../assets/img/Carrousel/img1.jpeg';
+import img2 from '../../assets/img/Carrousel/img2.jpg';
+import img3 from '../../assets/img/Carrousel/img3.jpg';
+import img4 from '../../assets/img/Carrousel/img4.jpg';
+import img5 from '../../assets/img/Carrousel/img5.jpg';
 
 const images = [img1, img2, img3, img4, img5];
 
