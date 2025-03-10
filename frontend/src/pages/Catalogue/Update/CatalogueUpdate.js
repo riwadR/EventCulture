@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { updateCatalogue } from '../../services/catalogueService.js';
+import { updateCatalogue } from '../../../services/catalogueService.js';
 
 const CatalogueUpdate = ({ catalogue, onCatalogueUpdated }) => {
   const [nom, setNom] = useState(catalogue.nom);
