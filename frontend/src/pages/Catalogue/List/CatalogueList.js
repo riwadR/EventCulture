@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { getAllCatalogues, deleteCatalogue } from '../../services/catalogueService.js';
-import CatalogueNew from './CatalogueNew.js';
-import CatalogueUpdate from './CatalogueUpdate.js';
+import { getAllCatalogues, deleteCatalogue } from '../../../services/catalogueService.js';
+import CatalogueNew from '../New/CatalogueNew.js';
+import CatalogueUpdate from '../Update/CatalogueUpdate.js';
 
 const CatalogueList = () => {
   const [catalogues, setCatalogues] = useState([]);
