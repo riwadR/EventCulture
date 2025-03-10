@@ -9,6 +9,7 @@ const Navbar = () => {
     const buttons = [
         { name: 'Accueil', path:'/' },
         { name: 'Formulaire', path:'/formulaire' },
+        { name: 'Catalogue', path:'/catalogue' }
     ];
 
     const handleClick = (path) => {
