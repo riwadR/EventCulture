@@ -12,11 +12,13 @@ const parcoursRoutes = require("./routes/parcoursRoutes");
 const parcoursLieuxRoutes = require("./routes/parcoursLieuxRoutes");
 const programmeRoutes = require("./routes/programmeRoutes");
 const oeuvreRoutes = require("./routes/oeuvreRoutes");
+const cors = require('cors');
 
 dotenv.config();
 
 const app = express();
 app.use(express.json())
+.use(cors())
 .use("/api/users", userRoutes) // Utiliser les routes User
 .use("/api/events", eventRoutes) // Utiliser les routes event
 .use("/api/programmes", programmeRoutes) // Utiliser les routes programme
