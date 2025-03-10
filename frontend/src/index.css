@@ -12,10 +12,11 @@ code {
     monospace;
 }
 
-body {
+html, body {
   font-family: Arial, sans-serif;
-  text-align: center;
   background-color: #f4f4f4;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 h1 {

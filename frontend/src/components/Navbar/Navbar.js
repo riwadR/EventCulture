@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router';
+import './Navbar.css';
 
 const Navbar = () => {
 
@@ -15,7 +16,7 @@ const Navbar = () => {
     };
 
     return (
-        <div>
+        <div className="navbar">
             <nav>
                 {buttons.map((button, index) => (
                     <button
@@ -26,8 +27,6 @@ const Navbar = () => {
                     </button>
                 ))}
             </nav>
-            <div>
-            </div>
         </div>
     );
 };
