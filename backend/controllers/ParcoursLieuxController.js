@@ -1,5 +1,5 @@
 // controllers/ParcoursLieuxController.js
-const ParcoursLieux = require('../models/ParcoursLieux');
+const ParcoursLieux = require('../models/Parcours_Lieux');
 
 // Créer un nouveau parcours-lieu
 const createParcoursLieux = async (req, res) => {

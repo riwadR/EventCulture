@@ -3,8 +3,8 @@ const Media = require('../models/Media');
 // Créer un nouveau média
 const createMedia = async (req, res) => {
   try {
-    const { id_event, id_program, id_catalog, type_media, url_media } = req.body;
-    const newMedia = await Media.create({ id_event, id_program, id_catalog, type_media, url_media });
+    const { id_event, id_programme, id_catalog, type_media, url_media } = req.body;
+    const newMedia = await Media.create({ id_event, id_programme, id_catalog, type_media, url_media });
     res.status(201).json({ message: 'Média créé avec succès', media: newMedia });
   } catch (error) {
     console.error(error);

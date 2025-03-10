@@ -27,7 +27,7 @@ const Media = sequelize.define("Media", {
     allowNull: false,
     references: {
       model: Programme, // Référence la table Programme
-      key: "id_program",
+      key: "id_programme",
     },
     onUpdate: "CASCADE",
     onDelete: "CASCADE",
