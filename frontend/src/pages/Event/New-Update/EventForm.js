@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createEvent, updateEvent, getEventById } from '../../../services/eventService';
 
-const EventForm = ({ match }) => {
+const EventForm = ({ match, onValidated }) => {
     const [eventData, setEventData] = useState({
         titre: '',
         description: '',
@@ -49,6 +49,10 @@ const EventForm = ({ match }) => {
         e.preventDefault();
         try {
             if (isEditMode) {
+                console.log("Updating event:", match);
+                if (onValidated) {
+                    onValidated();
+                }
                 await updateEvent(match.params.id, eventData);
             } else {
                 await createEvent(eventData);

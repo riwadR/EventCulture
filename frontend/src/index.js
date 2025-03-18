@@ -13,6 +13,9 @@ import CatalogueUpdate from './pages/Catalogue/Update/CatalogueUpdate';
 import EventList from './pages/Event/List/EventList.js';
 import EventForm from './pages/Event/New-Update/EventForm';
 
+import Login from './pages/User/login/Login.js';
+import Register from './pages/User/register/Register.js';
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
@@ -33,6 +36,10 @@ root.render(
       <Route path="/event" element={<EventList />} />
       <Route path="/event/new" element={<EventForm />} />
       <Route path="/event/update/:id" element={<EventForm />} />
+
+      {/* User */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
 
     </Routes>
   </BrowserRouter>

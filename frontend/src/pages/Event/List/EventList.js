@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { getAllEvents, deleteEvent } from '../../../services/eventService';
+import EventForm from '../New-Update/EventForm';
 
 const EventList = () => {
     const [events, setEvents] = useState([]);
+    const [currentEvent, setCurrentEvent] = useState(null);
 
     useEffect(() => {
         fetchEvents();
@@ -29,6 +31,16 @@ const EventList = () => {
     return (
         <div>
             <h2>Event List</h2>
+            {
+                currentEvent ? (
+                    <EventForm match={{ params: { id: currentEvent.id_event } }} onValidated={() => {
+                        setCurrentEvent(null);
+                        fetchEvents();
+                    }} />
+                ) : (
+                    <h1>Nada</h1>
+                )
+            }
             <ul>
                 {events.map(event => (
                     <li key={event.id_event}>
@@ -37,6 +49,7 @@ const EventList = () => {
                         <p><strong>Start:</strong> {new Date(event.dateDebut).toLocaleString()}</p>
                         <p><strong>End:</strong> {new Date(event.dateFin).toLocaleString()}</p>
                         <button onClick={() => handleDelete(event.id_event)}>Delete</button>
+                        <button onClick={() => setCurrentEvent(event)}>Edit</button>                        
                     </li>
                 ))}
             </ul>
