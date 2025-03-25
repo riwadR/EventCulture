@@ -38,21 +38,21 @@ const EventList = () => {
                         fetchEvents();
                     }} />
                 ) : (
-                    <h1>Nada</h1>
+                    <ul>
+                        {events.map(event => (
+                            <li key={event.id_event}>
+                                <h3>{event.titre}</h3>
+                                <p>{event.description}</p>
+                                <p><strong>Start:</strong> {new Date(event.dateDebut).toLocaleString()}</p>
+                                <p><strong>End:</strong> {new Date(event.dateFin).toLocaleString()}</p>
+                                <button onClick={() => handleDelete(event.id_event)}>Delete</button>
+                                <button onClick={() => setCurrentEvent(event)}>Edit</button>
+                            </li>
+                        ))}
+                    </ul>
                 )
             }
-            <ul>
-                {events.map(event => (
-                    <li key={event.id_event}>
-                        <h3>{event.titre}</h3>
-                        <p>{event.description}</p>
-                        <p><strong>Start:</strong> {new Date(event.dateDebut).toLocaleString()}</p>
-                        <p><strong>End:</strong> {new Date(event.dateFin).toLocaleString()}</p>
-                        <button onClick={() => handleDelete(event.id_event)}>Delete</button>
-                        <button onClick={() => setCurrentEvent(event)}>Edit</button>                        
-                    </li>
-                ))}
-            </ul>
+
         </div>
     );
 };

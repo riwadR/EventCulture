@@ -1,9 +1,26 @@
 import React, { useState } from 'react';
 import { createCatalogue } from '../../../services/catalogueService.js';
+import { getAllEvents } from '../../../services/eventService.js';
+import { useEffect } from 'react';
 
 const CatalogueNew = ({ onCatalogueAdded }) => {
   const [nom, setNom] = useState('');
   const [description, setDescription] = useState('');
+  const [events, setEvents] = useState([]);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const allEvents = await getAllEvents();
+        const eventIds = allEvents.map(event => event.id_event);
+        setEvents(eventIds);
+      } catch (error) {
+        console.error('Erreur lors de la récupération des événements', error);
+      }
+    };
+
+    fetchEvents();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,6 +50,13 @@ const CatalogueNew = ({ onCatalogueAdded }) => {
         value={description}
         onChange={(e) => setDescription(e.target.value)}
       />
+      <select>
+        {events.map(eventId => (
+          <option key={eventId} value={eventId}>
+        {eventId}
+          </option>
+        ))}
+      </select>
       <button type="submit">Ajouter</button>
     </form>
   );

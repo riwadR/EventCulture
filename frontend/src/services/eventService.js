@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const apiUrl = 'http://localhost:3000/api/events'; // URL to your Node.js API
+const apiUrl = 'http://localhost:3001/api/events'; // URL to your Node.js API
 
 // Create a new event
 export const createEvent = async (eventData) => {
