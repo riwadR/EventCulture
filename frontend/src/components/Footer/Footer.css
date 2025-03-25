@@ -23,7 +23,6 @@
     transition: color 0.3s;
   }
   
-  .footer-links a:hover {
-    color: white;
+  .footer-links button:hover {
+    text-decoration: underline;
   }
-  
