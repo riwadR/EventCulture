@@ -34,7 +34,7 @@ const Register = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(null);
-
+    
         // Create FormData object
         const formDataToSend = new FormData();
         
@@ -42,66 +42,87 @@ const Register = () => {
         Object.keys(formData).forEach(key => {
             formDataToSend.append(key, formData[key]);
         });
-
+    
         // Append photos
         photos.forEach((photo, index) => {
             formDataToSend.append('photos', photo);
         });
-
+    
         try {
+            // Ajout d'un timeout plus long et de logs additionnels
+            console.log('Sending request to server...');
+            
             const response = await fetch('http://localhost:3003/api/users/new', {
                 method: 'POST',
                 body: formDataToSend,
+                timeout: 30000, // 30 secondes de timeout
                 // No need to set Content-Type header, browser will set it automatically
             });
-
-            // Log full response for debugging
-            console.log('Full Response:', response);
-
+    
+            console.log('Response received:', response.status, response.statusText);
+    
+            // Check if the response is ok (status in the range 200-299)
+            if (!response.ok) {
+                throw new Error(`Server responded with status: ${response.status}`);
+            }
+    
             // Parse response text for more details
             const responseText = await response.text();
             console.log('Response Text:', responseText);
-
+    
             // Try to parse the response as JSON
             let data;
             try {
                 data = JSON.parse(responseText);
             } catch (parseError) {
                 console.error('Failed to parse response:', parseError);
-                setError(`Unexpected server response: ${responseText}`);
+                setError(`Unexpected server response format: ${responseText.substring(0, 100)}...`);
                 return;
             }
-
-            // Handle response
-            if (response.ok) {
-                if (data.success) {
-                    // Show success modal instead of alert
-                    setShowSuccessModal(true);
-                    
-                    // Reset form
-                    setFormData({
-                        role: 'user',
-                        firstName: '',
-                        lastName: '',
-                        email: '',
-                        password: '',
-                        phone: '',
-                        genre: "Homme",
-                        departement: "Mascara",
-                        participation: "Exposition uniquement",
-                        autreParticipation: ''
-                    });
-                    setPhotos([]);
-                } else {
-                    setError(data.error || 'Registration failed');
-                }
-            } else {
-                // Handle error responses
-                setError(data.error || 'An unexpected error occurred');
-            }
+    
+            // Show success modal
+            setShowSuccessModal(true);
+            
+            // Reset form
+            setFormData({
+                role: 'user',
+                firstName: '',
+                lastName: '',
+                email: '',
+                password: '',
+                phone: '',
+                genre: "Homme",
+                departement: "Mascara",
+                participation: "Exposition uniquement",
+                autreParticipation: ''
+            });
+            setPhotos([]);
+            
         } catch (error) {
-            console.error('Full Error:', error);
-            setError(error.message);
+            console.error('Error during form submission:', error);
+            
+            if (error.message.includes('NetworkError') || error.message.includes('Failed to fetch')) {
+                // Détection spécifique d'erreur réseau
+                setError("Problème de connexion réseau. Votre inscription a peut-être été traitée, mais nous n'avons pas pu recevoir la confirmation.");
+                
+                // Vous pourriez vérifier si l'utilisateur existe déjà après un court délai
+                setTimeout(async () => {
+                    try {
+                        // Vérifiez si l'utilisateur existe dans la base de données
+                        const checkResponse = await fetch(`http://localhost:3003/api/users/check-email?email=${formData.email}`);
+                        const checkData = await checkResponse.json();
+                        
+                        if (checkData.exists) {
+                            setShowSuccessModal(true);
+                            setError(null);
+                        }
+                    } catch (e) {
+                        console.error("Couldn't verify user creation:", e);
+                    }
+                }, 2000);
+            } else {
+                setError(`Erreur: ${error.message}`);
+            }
         }
     };
 

@@ -3,6 +3,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const bcrypt = require('bcrypt'); 
+const { check } = require("express-validator");
 
 // Configure multer storage
 const storage = multer.diskStorage({
@@ -200,7 +201,18 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const checkEmailExists = async (req, res) => {
+  try {
+    const { email } = req.query;
+    const user = await User.findOne({ where: { email } });
+    res.status(200).json({ exists: !!user });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
+  checkEmailExists,
   createUser,
   updateUser,
   getUserByPk,

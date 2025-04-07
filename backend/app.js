@@ -7,6 +7,23 @@ const path = require("path");
 const findFreePort = require("find-free-port");
 const app = express();
 
+// Chargement des variables d'environnement
+dotenv.config();
+
+// CORS middleware first
+app.use(cors({
+  origin: ['http://localhost:3000'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization', ]
+}));
+
+// Security middleware
+app.use(helmet());
+
+// Parsing middlewares - order matters
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 // Importation des routes
 const userRoutes = require("./routes/userRoutes");
 const catalogueRoutes = require("./routes/catalogueRoutes");
@@ -32,23 +49,6 @@ app.use("/api/parcours", parcoursRoutes);
 app.use("/api/parcoursLieux", parcoursLieuxRoutes);
 app.use("/api/participants", participantRoutes);
 app.use("/api/oeuvres", oeuvreRoutes);
-
-// Chargement des variables d'environnement
-dotenv.config();
-
-// CORS middleware first
-app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:3001'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
-// Security middleware
-app.use(helmet());
-
-// Parsing middlewares - order matters
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 // Serve static files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
