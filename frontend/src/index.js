@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import { BrowserRouter, Routes, Route } from 'react-router';
-import Formulaire from './pages/Formulaire/Formulaire';
 import Navbar from './components/Navbar/Navbar';
 
 import CatalogueList from './pages/Catalogue/List/CatalogueList';
@@ -25,17 +24,17 @@ root.render(
 
     <Routes>
       <Route path="/" element={<App />} />
-      <Route path="/formulaire" element={<Formulaire />} />
+      <Route path="/register" element={<Register />} />
 
       // Catalogue
-      <Route path="/catalogue" element={<CatalogueList />} />
-      <Route path="/catalogue/new" element={<CatalogueNew />} />
-      <Route path="/catalogue/update/:id" element={<CatalogueUpdate />} />
+      <Route path="/catalogues" element={<CatalogueList />} />
+      <Route path="/catalogues/new" element={<CatalogueNew />} />
+      <Route path="/catalogues/update/:id" element={<CatalogueUpdate />} />
 
-      // Event
-      <Route path="/event" element={<EventList />} />
-      <Route path="/event/new" element={<EventForm />} />
-      <Route path="/event/update/:id" element={<EventForm />} />
+      // Event 
+      <Route path="/events/" element={<EventList />} />
+      <Route path="/events/new" element={<EventForm />} />
+      <Route path="/events/update/:id" element={<EventForm />} />
 
       {/* User */}
       <Route path="/login" element={<Login />} />

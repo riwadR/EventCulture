@@ -8,7 +8,8 @@ const Navbar = () => {
 
     const buttons = [
         { name: 'Accueil', path:'/' },
-        { name: 'Formulaire', path:'/formulaire' },
+        { name: 'Inscription', path:'/register' },
+        { name: 'Connexion', path:'/login'},
         { name: 'Catalogue', path:'/catalogue' },
         { name: 'Event', path:'/event' },
     ];

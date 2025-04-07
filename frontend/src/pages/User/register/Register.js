@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "./Register.css";
 
 const Register = () => {
     const [formData, setFormData] = useState({
@@ -13,6 +14,9 @@ const Register = () => {
         participation: "Exposition uniquement",
     });
 
+    const [photos, setPhotos] = useState([]);
+    const [error, setError] = useState(null);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({
@@ -21,34 +25,90 @@ const Register = () => {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleFileChange = (e) => {
+        setPhotos([...e.target.files]);
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        setError(null);
+
+        // Create FormData object
+        const formDataToSend = new FormData();
         
-        fetch('http://localhost:3001/api/users/new', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData),
-        })
-            .then(response => response.json())
-            .then(data => {
+        // Append text fields
+        Object.keys(formData).forEach(key => {
+            formDataToSend.append(key, formData[key]);
+        });
+
+        // Append photos
+        photos.forEach((photo, index) => {
+            formDataToSend.append('photos', photo);
+        });
+
+        try {
+            const response = await fetch('http://localhost:3003/api/users/new', {
+                method: 'POST',
+                body: formDataToSend,
+                // No need to set Content-Type header, browser will set it automatically
+            });
+
+            // Log full response for debugging
+            console.log('Full Response:', response);
+
+            // Parse response text for more details
+            const responseText = await response.text();
+            console.log('Response Text:', responseText);
+
+            // Try to parse the response as JSON
+            let data;
+            try {
+                data = JSON.parse(responseText);
+            } catch (parseError) {
+                console.error('Failed to parse response:', parseError);
+                setError(`Unexpected server response: ${responseText}`);
+                return;
+            }
+
+            // Handle response
+            if (response.ok) {
                 if (data.success) {
                     alert('Registration successful');
+                    // Optional: Reset form or redirect
+                    setFormData({
+                        role: 'admin',
+                        firstName: '',
+                        lastName: '',
+                        email: '',
+                        password: '',
+                        phone: '',
+                        genre: "Homme",
+                        departement: "Mascara",
+                        participation: "Exposition uniquement",
+                    });
+                    setPhotos([]);
                 } else {
-                    alert('Registration failed');
+                    setError(data.error || 'Registration failed');
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred');
-            });
+            } else {
+                // Handle error responses
+                setError(data.error || 'An unexpected error occurred');
+            }
+        } catch (error) {
+            console.error('Full Error:', error);
+            setError(error.message);
+        }
     };
 
     return (
         <div className="register-page">
             <h2>Register</h2>
-            <form onSubmit={handleSubmit}>
+            {error && (
+                <div style={{ color: 'red', marginBottom: '15px' }}>
+                    Error: {error}
+                </div>
+            )}
+            <form onSubmit={handleSubmit} encType="multipart/form-data">
                 <div className="form-group">
                     <label htmlFor="role">Role:</label>
                     <select
@@ -188,6 +248,22 @@ const Register = () => {
                         <option value="Atelier et exposition">Atelier et exposition</option>
                     </select>
                 </div>
+
+                <div className="form-group">
+                    <label htmlFor="photos">Photos (optionnel) :</label>
+                    <input
+                        type="file"
+                        id="photos"
+                        name="photos"
+                        multiple
+                        accept="image/*"
+                        onChange={handleFileChange}
+                    />
+                    {photos.length > 0 && (
+                        <p>{photos.length} fichier(s) sélectionné(s)</p>
+                    )}
+                </div>
+                
                 <button type="submit">Register</button>
             </form>
         </div>
