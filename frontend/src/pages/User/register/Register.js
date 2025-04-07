@@ -3,7 +3,7 @@ import "./Register.css";
 
 const Register = () => {
     const [formData, setFormData] = useState({
-        role: 'admin',
+        role: 'user',
         firstName: '',
         lastName: '',
         email: '',
@@ -12,10 +12,12 @@ const Register = () => {
         genre: "Homme",
         departement: "Mascara",
         participation: "Exposition uniquement",
+        autreParticipation:''
     });
 
     const [photos, setPhotos] = useState([]);
     const [error, setError] = useState(null);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -73,10 +75,12 @@ const Register = () => {
             // Handle response
             if (response.ok) {
                 if (data.success) {
-                    alert('Registration successful');
-                    // Optional: Reset form or redirect
+                    // Show success modal instead of alert
+                    setShowSuccessModal(true);
+                    
+                    // Reset form
                     setFormData({
-                        role: 'admin',
+                        role: 'user',
                         firstName: '',
                         lastName: '',
                         email: '',
@@ -85,6 +89,7 @@ const Register = () => {
                         genre: "Homme",
                         departement: "Mascara",
                         participation: "Exposition uniquement",
+                        autreParticipation: ''
                     });
                     setPhotos([]);
                 } else {
@@ -100,14 +105,36 @@ const Register = () => {
         }
     };
 
+    // Function to close the modal
+    const closeModal = () => {
+        setShowSuccessModal(false);
+    };
+
     return (
         <div className="register-page">
-            <h2>Register</h2>
-            {error && (
-                <div style={{ color: 'red', marginBottom: '15px' }}>
-                    Error: {error}
+            <h2>Inscription</h2>
+            
+            {/* Success Modal */}
+            {showSuccessModal && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h3>Inscription réussie</h3>
+                        </div>
+                        <div className="modal-body">
+                            <p>Votre compte a été créé avec succès!</p>
+                            <p>Vous pouvez maintenant vous connecter avec vos identifiants.</p>
+                        </div>
+                        <div className="modal-footer">
+                            <button onClick={closeModal} className="modal-button">Fermer</button>
+                        </div>
+                    </div>
                 </div>
             )}
+
+            {/* Error message display */}
+            {error && <div className="error-message">{error}</div>}
+            
             <form onSubmit={handleSubmit} encType="multipart/form-data">
                 <div className="form-group">
                     <label htmlFor="role">Role:</label>
@@ -123,7 +150,7 @@ const Register = () => {
                     </select>
                 </div>
                 <div className="form-group">
-                    <label htmlFor="firstName">First Name:</label>
+                    <label htmlFor="firstName">Prénom :</label>
                     <input
                         type="text"
                         id="firstName"
@@ -134,7 +161,7 @@ const Register = () => {
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="lastName">Last Name:</label>
+                    <label htmlFor="lastName">Nom de famille :</label>
                     <input
                         type="text"
                         id="lastName"
@@ -145,7 +172,7 @@ const Register = () => {
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="email">Email:</label>
+                    <label htmlFor="email">Adresse Email :</label>
                     <input
                         type="email"
                         id="email"
@@ -156,7 +183,7 @@ const Register = () => {
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="password">Password:</label>
+                    <label htmlFor="password">Mot de passe :</label>
                     <input
                         type="password"
                         id="password"
@@ -167,18 +194,19 @@ const Register = () => {
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="phone">Phone:</label>
+                    <label htmlFor="phone">Numéro de téléphone :</label>
                     <input
                         type="text"
                         id="phone"
                         name="phone"
                         value={formData.phone}
                         onChange={handleChange}
+                        placeholder="Entrez votre numéro de téléphone en précisant l'indicatif."
                         required
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="genre">Genre:</label>
+                    <label htmlFor="genre">Genre :</label>
                     <select
                         id="genre"
                         name="genre"
@@ -235,7 +263,7 @@ const Register = () => {
                     </select>
                 </div>
                 <div className="form-group">
-                    <label htmlFor="participation">Participation:</label>
+                    <label htmlFor="participation">Participation :</label>
                     <select
                         id="participation"
                         name="participation"
@@ -247,6 +275,17 @@ const Register = () => {
                         <option value="Atelier uniquement">Atelier uniquement</option>
                         <option value="Atelier et exposition">Atelier et exposition</option>
                     </select>
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="autreParticipation">Autre participation :</label>
+                    <input
+                        id="autreParticipation"
+                        name="autreParticipation"
+                        value={formData.autreParticipation}
+                        onChange={handleChange}
+                        placeholder="Décrivez ici vos éventuelles autres participations (optionnel)."
+                    />
                 </div>
 
                 <div className="form-group">
@@ -264,7 +303,7 @@ const Register = () => {
                     )}
                 </div>
                 
-                <button type="submit">Register</button>
+                <button type="submit">Inscription</button>
             </form>
         </div>
     );
