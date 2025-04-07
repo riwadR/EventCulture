@@ -15,6 +15,10 @@ import EventForm from './pages/Event/New-Update/EventForm';
 import Login from './pages/User/login/Login.js';
 import Register from './pages/User/register/Register.js';
 
+import About from './pages/Footer/About/About';
+import Contact from './pages/Footer/Contact/Contact';
+import Legal from './pages/Footer/Legal/Legal';
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
@@ -39,6 +43,11 @@ root.render(
       {/* User */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+
+      {/* Footer */}
+      <Route path="/about" element={<About />} />
+      <Route path="/contact" element={<Contact />} />
+      <Route path="/legal" element={<Legal />} />
 
     </Routes>
   </BrowserRouter>
