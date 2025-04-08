@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './Carrousel.css';
+import './Carrousel.scss';
 
 import img1 from '../../assets/img/Carrousel/img1.jpeg';
 import img2 from '../../assets/img/Carrousel/img2.jpg';

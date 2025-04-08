@@ -15,6 +15,7 @@ interface EventFormProps {
 const EventList: React.FC = () => {
     const [events, setEvents] = useState<Event[]>([]);
     const [currentEvent, setCurrentEvent] = useState<Event | null>(null);
+    const [isCreating, setIsCreating] = useState<boolean>(false);
 
     useEffect(() => {
         fetchEvents();
@@ -40,7 +41,7 @@ const EventList: React.FC = () => {
 
     return (
         <div>
-            <h2>Event List</h2>
+            <h2>Liste des événements</h2>
             {
                 currentEvent ? (
                     <EventForm 
@@ -50,22 +51,49 @@ const EventList: React.FC = () => {
                             fetchEvents();
                         }}
                     />
+                ) : isCreating ? (
+                    <EventForm 
+                        match={{ params: { id: "new" } }}
+                        onValidated={() => {
+                            setIsCreating(false);
+                            fetchEvents();
+                        }}
+                    />
                 ) : (
-                    <ul>
-                        {events.map(event => (
-                            <li key={event.id_event}>
-                                <h3>{event.titre}</h3>
-                                <p>{event.description}</p>
-                                <p><strong>Start:</strong> {new Date(event.dateDebut).toLocaleString()}</p>
-                                <p><strong>End:</strong> {new Date(event.dateFin).toLocaleString()}</p>
-                                <button onClick={() => handleDelete(event.id_event as number)}>Delete</button>
-                                <button onClick={() => setCurrentEvent(event)}>Edit</button>
-                            </li>
-                        ))}
-                    </ul>
+                    <>
+                        <button 
+                            onClick={() => setIsCreating(true)}
+                            style={{ marginBottom: '20px', padding: '8px 16px', backgroundColor: '#4CAF50', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                        >
+                            Créer un événement
+                        </button>
+                        <ul style={{ listStyle: 'none', padding: 0 }}>
+                            {events.map(event => (
+                                <li key={event.id_event} style={{ marginBottom: '20px', padding: '15px', border: '1px solid #ddd', borderRadius: '5px' }}>
+                                    <h3>{event.titre}</h3>
+                                    <p>{event.description}</p>
+                                    <p><strong>Début:</strong> {new Date(event.dateDebut).toLocaleString()}</p>
+                                    <p><strong>Fin:</strong> {new Date(event.dateFin).toLocaleString()}</p>
+                                    <div style={{ marginTop: '10px' }}>
+                                        <button 
+                                            onClick={() => handleDelete(event.id_event as number)}
+                                            style={{ marginRight: '10px', padding: '5px 10px', backgroundColor: '#f44336', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                                        >
+                                            Supprimer
+                                        </button>
+                                        <button 
+                                            onClick={() => setCurrentEvent(event)}
+                                            style={{ padding: '5px 10px', backgroundColor: '#2196F3', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                                        >
+                                            Modifier
+                                        </button>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    </>
                 )
             }
-
         </div>
     );
 };

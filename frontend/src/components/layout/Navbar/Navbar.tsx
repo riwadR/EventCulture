@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../contexts/AuthContext"; // Ajustez le chemin selon votre structure
-import "./Navbar.css";
+import "./Navbar.scss";
 
 interface NavButton {
   name: string;

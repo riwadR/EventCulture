@@ -1,12 +1,19 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../../contexts/AuthContext"; // Ajustez le chemin selon votre structure
-import "./Login.css";
+import "./Login.scss";
 
 const Login: React.FC = () => {
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const navigate = useNavigate();
+    const location = useLocation();
+    
+    // Récupérer le message et la page d'origine si redirigé
+    const state = location.state as { from?: { pathname: string }; message?: string } | null;
+    const message = state?.message;
+    const from = state?.from?.pathname || '/';
+    
     // Récupérer la fonction login du contexte
     const { login } = useAuth();
 
@@ -34,8 +41,8 @@ const Login: React.FC = () => {
                 console.log("Success:", data);
                 // Activer l'état authentifié
                 login(email, password);
-                // Redirection vers la racine après une connexion réussie
-                navigate('/'); 
+                // Redirection vers la page d'origine si redirigé, sinon vers la racine
+                navigate(from);
             })
             .catch((error) => {
                 console.error("Error:", error);
@@ -46,6 +53,14 @@ const Login: React.FC = () => {
     return (
         <div className="login-container">
             <h2>Connexion</h2>
+            
+            {/* Afficher le message de redirection s'il existe */}
+            {message && (
+                <div className="alert alert-info">
+                    {message}
+                </div>
+            )}
+            
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
                     <label htmlFor="email">Email:</label>

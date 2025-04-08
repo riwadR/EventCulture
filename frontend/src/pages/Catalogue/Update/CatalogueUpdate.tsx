@@ -1,5 +1,5 @@
 import React, { useState, FormEvent, ChangeEvent } from 'react';
-import { updateCatalogue } from '../../../services/catalogueService.js';
+import { updateCatalogue } from '../../../services/catalogueService';
 import Catalogue from '../../../models/Catalogue';
 
 interface CatalogueUpdateProps {

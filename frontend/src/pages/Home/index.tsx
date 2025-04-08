@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import Button from '../../components/common/Button';
 import Card from '../../components/common/Card';
 import { ROUTES } from '../../config/routes';
-import './Home.css';
+import './Home.scss';
 
 interface Event {
   id: number;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNotification } from '../../../contexts/NotificationContext';
 import Alert from '../Alert/Alert';
-import './NotificationList.css';
+import './NotificationList.scss';
 
 const NotificationList: React.FC = () => {
   const { notifications, removeNotification } = useNotification();

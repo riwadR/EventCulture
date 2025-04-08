@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router";
-import "./Footer.css";
+import "./Footer.scss";
 
 interface FooterButton {
   name: string;

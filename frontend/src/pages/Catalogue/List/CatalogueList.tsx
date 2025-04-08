@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { getAllCatalogues, deleteCatalogue } from '../../../services/catalogueService.js';
-import CatalogueNew from '../New/CatalogueNew.js';
-import CatalogueUpdate from '../Update/CatalogueUpdate.js';
+import { getAllCatalogues, deleteCatalogue } from '../../../services/catalogueService';
+import CatalogueNew from '../New/CatalogueNew';
+import CatalogueUpdate from '../Update/CatalogueUpdate';
 import Catalogue from '../../../models/Catalogue';
 
 const CatalogueList: React.FC = () => {

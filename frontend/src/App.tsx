@@ -7,6 +7,7 @@ import NotificationList from './components/common/NotificationList/NotificationL
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import { ROUTES } from './config/routes';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 
 // Pages
 import HomePage from './pages/Home';
@@ -18,7 +19,9 @@ import Register from './pages/User/register/Register';
 import NotFoundPage from './pages/NotFound';
 
 // Styles globaux
-import './index.css';
+import './index.scss';
+import CatalogueList from './pages/Catalogue/List/CatalogueList';
+import EventList from './pages/Event/List/EventList';
 
 const App: React.FC = () => {
   return (
@@ -34,12 +37,20 @@ const App: React.FC = () => {
                   <Route path={ROUTES.HOME} element={<HomePage />} />
                   {/* <Route path={ROUTES.ABOUT} element={<AboutPage />} /> */}
                   {/* <Route path={ROUTES.CONTACT} element={<ContactPage />} /> */}
-                  <Route path={ROUTES.EVENTS} element={<div>Page d'événements</div>} />
+                  <Route path={ROUTES.EVENTS} element={
+                    <ProtectedRoute>
+                      <EventList />
+                    </ProtectedRoute>
+                  } />
                   {/* <Route path={ROUTES.EVENT_DETAILS} element={<EventDetailsPage />} /> */}
                   <Route path={ROUTES.LOGIN} element={<Login />} />
                   <Route path={ROUTES.REGISTER} element={<Register />} />
                   {/* <Route path={ROUTES.PROFILE} element={<ProfilePage />} /> */}
-                  <Route path="/catalogues" element={<div>Page de catalogues</div>} />
+                  <Route path={ROUTES.CATALOGUES} element={
+                    <ProtectedRoute>
+                      <CatalogueList />
+                    </ProtectedRoute>
+                  } />
                   <Route path="*" element={<NotFoundPage />} />
                 </Routes>
               </main>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, FormEvent, ChangeEvent } from 'react';
-import { createCatalogue } from '../../../services/catalogueService.js';
-import { getAllEvents } from '../../../services/eventService.js';
+import { createCatalogue } from '../../../services/catalogueService';
+import { getAllEvents } from '../../../services/eventService';
 import Event from '../../../models/Event';
 
 interface CatalogueNewProps {

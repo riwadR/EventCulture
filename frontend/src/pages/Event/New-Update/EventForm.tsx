@@ -34,9 +34,11 @@ const EventForm = ({ match, onValidated }: EventFormProps) => {
     const [isEditMode, setIsEditMode] = useState(false);
 
     useEffect(() => {
-        if (match && match.params.id) {
+        if (match && match.params.id && match.params.id !== 'new') {
             setIsEditMode(true);
             fetchEvent(match.params.id);
+        } else {
+            setIsEditMode(false);
         }
     }, [match]);
 
@@ -74,17 +76,16 @@ const EventForm = ({ match, onValidated }: EventFormProps) => {
                 id_createur: eventData.id_createur === '' ? null : Number(eventData.id_createur)
             };
 
-            if (isEditMode && match) {
-                console.log("Updating event:", match);
+            if (isEditMode && match && match.params.id !== 'new') {
+                console.log("Mise à jour de l'événement:", match.params.id);
                 await updateEvent(match.params.id, submitData);
-                if (onValidated) {
-                    onValidated();
-                }
             } else {
+                console.log("Création d'un nouvel événement");
                 await createEvent(submitData);
-                if (onValidated) {
-                    onValidated();
-                }
+            }
+            
+            if (onValidated) {
+                onValidated();
             }
         } catch (error) {
             console.error("There was an error submitting the form:", error);
@@ -93,62 +94,117 @@ const EventForm = ({ match, onValidated }: EventFormProps) => {
 
     return (
         <div>
-            <h2>{isEditMode ? 'Edit Event' : 'Create Event'}</h2>
+            <h2>{isEditMode ? 'Modifier l\'événement' : 'Créer un événement'}</h2>
             <form onSubmit={handleSubmit}>
-                <input
-                    type="text"
-                    name="titre"
-                    value={eventData.titre}
-                    onChange={handleChange}
-                    placeholder="Event Title"
-                    required
-                />
-                <textarea
-                    name="description"
-                    value={eventData.description}
-                    onChange={handleChange}
-                    placeholder="Event Description"
-                />
-                <select
-                    name="type"
-                    value={eventData.type}
-                    onChange={handleChange}
+                <div style={{ marginBottom: '15px' }}>
+                    <label htmlFor="titre" style={{ display: 'block', marginBottom: '5px' }}>Titre</label>
+                    <input
+                        id="titre"
+                        type="text"
+                        name="titre"
+                        value={eventData.titre}
+                        onChange={handleChange}
+                        placeholder="Titre de l'événement"
+                        required
+                        style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+                    />
+                </div>
+                
+                <div style={{ marginBottom: '15px' }}>
+                    <label htmlFor="description" style={{ display: 'block', marginBottom: '5px' }}>Description</label>
+                    <textarea
+                        id="description"
+                        name="description"
+                        value={eventData.description}
+                        onChange={handleChange}
+                        placeholder="Description de l'événement"
+                        style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc', minHeight: '100px' }}
+                    />
+                </div>
+                
+                <div style={{ marginBottom: '15px' }}>
+                    <label htmlFor="type" style={{ display: 'block', marginBottom: '5px' }}>Type d'événement</label>
+                    <select
+                        id="type"
+                        name="type"
+                        value={eventData.type}
+                        onChange={handleChange}
+                        style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+                    >
+                        <option value="Exposition">Exposition</option>
+                        <option value="Atelier">Atelier</option>
+                        <option value="Concert">Concert</option>
+                    </select>
+                </div>
+                
+                <div style={{ marginBottom: '15px' }}>
+                    <label htmlFor="dateDebut" style={{ display: 'block', marginBottom: '5px' }}>Date de début</label>
+                    <input
+                        id="dateDebut"
+                        type="datetime-local"
+                        name="dateDebut"
+                        value={eventData.dateDebut}
+                        onChange={handleChange}
+                        required
+                        style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+                    />
+                </div>
+                
+                <div style={{ marginBottom: '15px' }}>
+                    <label htmlFor="dateFin" style={{ display: 'block', marginBottom: '5px' }}>Date de fin</label>
+                    <input
+                        id="dateFin"
+                        type="datetime-local"
+                        name="dateFin"
+                        value={eventData.dateFin}
+                        onChange={handleChange}
+                        required
+                        style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+                    />
+                </div>
+                
+                <div style={{ marginBottom: '15px' }}>
+                    <label htmlFor="id_lieu" style={{ display: 'block', marginBottom: '5px' }}>ID du lieu</label>
+                    <input
+                        id="id_lieu"
+                        type="number"
+                        name="id_lieu"
+                        value={eventData.id_lieu}
+                        onChange={handleChange}
+                        placeholder="Identifiant du lieu"
+                        required
+                        style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+                    />
+                </div>
+                
+                <div style={{ marginBottom: '15px' }}>
+                    <label htmlFor="id_createur" style={{ display: 'block', marginBottom: '5px' }}>ID du créateur</label>
+                    <input
+                        id="id_createur"
+                        type="number"
+                        name="id_createur"
+                        value={eventData.id_createur}
+                        onChange={handleChange}
+                        placeholder="Identifiant du créateur"
+                        required
+                        style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+                    />
+                </div>
+                
+                <button 
+                    type="submit"
+                    style={{ 
+                        padding: '10px 20px', 
+                        backgroundColor: '#4CAF50', 
+                        color: 'white', 
+                        border: 'none', 
+                        borderRadius: '4px', 
+                        cursor: 'pointer',
+                        fontSize: '16px'
+                    }}
                 >
-                    <option value="Exposition">Exposition</option>
-                    <option value="Atelier">Atelier</option>
-                    <option value="Concert">Concert</option>
-                </select>
-                <input
-                    type="datetime-local"
-                    name="dateDebut"
-                    value={eventData.dateDebut}
-                    onChange={handleChange}
-                    required
-                />
-                <input
-                    type="datetime-local"
-                    name="dateFin"
-                    value={eventData.dateFin}
-                    onChange={handleChange}
-                    required
-                />
-                <input
-                    type="number"
-                    name="id_lieu"
-                    value={eventData.id_lieu}
-                    onChange={handleChange}
-                    placeholder="Location ID"
-                    required
-                />
-                <input
-                    type="number"
-                    name="id_createur"
-                    value={eventData.id_createur}
-                    onChange={handleChange}
-                    placeholder="Creator ID"
-                    required
-                />
-                <button type="submit">{isEditMode ? 'Update' : 'Create'} Event</button>
+                    {isEditMode ? 'Mettre à jour' : 'Créer'} l'événement
+                </button>
             </form>
         </div>
     );

@@ -1,6 +1,6 @@
 import React, { forwardRef, ChangeEvent, FocusEvent, ReactNode } from 'react';
 import PropTypes from 'prop-types';
-import './Input.css';
+import './Input.scss';
 
 interface InputProps {
   type?: string;
