@@ -1,0 +1,37 @@
+.hero {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+    background-color: white;
+}
+
+.hero-image {
+    width: 40%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.hero-content {
+    width: 60%;
+}
+
+.hero-title {
+    font-size: 24px;
+    color: #336699;
+    margin-bottom: 8px;
+}
+
+.hero-subheading {
+    font-size: 18px;
+    color: #555;
+    margin-bottom: 16px;
+}
+
+.hero-content p {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.6;
+}

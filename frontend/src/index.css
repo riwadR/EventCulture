@@ -28,13 +28,13 @@ button {
   padding: 10px;
   border: none;
   cursor: pointer;
-  background-color: #007bff;
+  background-color: #CC8866;
   color: white;
   border-radius: 5px;
 }
 
 button:hover {
-  background-color: #0056b3;
+  background-color: #CC8866;
 }
 
 input {
