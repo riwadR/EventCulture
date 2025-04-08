@@ -1,13 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Register.css";
+import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         role: 'user',
         firstName: '',
         lastName: '',
         email: '',
         password: '',
+        confirmPassword: '', // Ajout de la confirmation du mot de passe
         phone: '',
         genre: "Homme",
         departement: "Mascara",
@@ -17,7 +20,44 @@ const Register = () => {
 
     const [photos, setPhotos] = useState([]);
     const [error, setError] = useState(null);
+    const [validationErrors, setValidationErrors] = useState({});
     const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+    // Règles de validation du mot de passe
+    const passwordRules = {
+        minLength: 8,
+        requireUppercase: true,
+        requireLowercase: true,
+        requireNumbers: true,
+        requireSpecialChars: true
+    };
+
+    // Fonction pour valider le mot de passe
+    const validatePassword = (password) => {
+        const errors = [];
+        
+        if (password.length < passwordRules.minLength) {
+            errors.push(`Le mot de passe doit contenir au moins ${passwordRules.minLength} caractères`);
+        }
+        
+        if (passwordRules.requireUppercase && !/[A-Z]/.test(password)) {
+            errors.push("Le mot de passe doit contenir au moins une lettre majuscule");
+        }
+        
+        if (passwordRules.requireLowercase && !/[a-z]/.test(password)) {
+            errors.push("Le mot de passe doit contenir au moins une lettre minuscule");
+        }
+        
+        if (passwordRules.requireNumbers && !/[0-9]/.test(password)) {
+            errors.push("Le mot de passe doit contenir au moins un chiffre");
+        }
+        
+        if (passwordRules.requireSpecialChars && !/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+            errors.push("Le mot de passe doit contenir au moins un caractère spécial (!@#$%^&*(),.?\":{}|<>)");
+        }
+        
+        return errors;
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -25,6 +65,44 @@ const Register = () => {
             ...formData,
             [name]: value,
         });
+        
+        // Effacer l'erreur spécifique lorsque l'utilisateur modifie un champ
+        if (validationErrors[name]) {
+            setValidationErrors({
+                ...validationErrors,
+                [name]: null
+            });
+        }
+    };
+
+    // Valider le formulaire avant soumission
+    const validateForm = () => {
+        const errors = {};
+        
+        // Valider l'email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.email)) {
+            errors.email = "Veuillez entrer une adresse email valide";
+        }
+        
+        // Valider le mot de passe
+        const passwordErrors = validatePassword(formData.password);
+        if (passwordErrors.length > 0) {
+            errors.password = passwordErrors;
+        }
+        
+        // Vérifier que les mots de passe correspondent
+        if (formData.password !== formData.confirmPassword) {
+            errors.confirmPassword = "Les mots de passe ne correspondent pas";
+        }
+        
+        // Valider le numéro de téléphone (format international recommandé)
+        const phoneRegex = /^\+?[0-9]{10,15}$/;
+        if (!phoneRegex.test(formData.phone.replace(/\s/g, ''))) {
+            errors.phone = "Veuillez entrer un numéro de téléphone valide (format international recommandé: +XXX XXXXXXXXX)";
+        }
+        
+        return errors;
     };
 
     const handleFileChange = (e) => {
@@ -34,13 +112,28 @@ const Register = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(null);
+        
+        // Valider le formulaire
+        const formErrors = validateForm();
+        if (Object.keys(formErrors).length > 0) {
+            setValidationErrors(formErrors);
+            // Trouver la première erreur pour l'afficher globalement
+            const firstError = Object.values(formErrors).find(error => error);
+            setError(Array.isArray(firstError) ? firstError[0] : firstError);
+            return;
+        }
+        
+        // Réinitialiser les erreurs de validation
+        setValidationErrors({});
     
         // Create FormData object
         const formDataToSend = new FormData();
         
-        // Append text fields
+        // Append text fields (exclure confirmPassword)
         Object.keys(formData).forEach(key => {
-            formDataToSend.append(key, formData[key]);
+            if (key !== 'confirmPassword') {
+                formDataToSend.append(key, formData[key]);
+            }
         });
     
         // Append photos
@@ -49,28 +142,24 @@ const Register = () => {
         });
     
         try {
-            // Ajout d'un timeout plus long et de logs additionnels
             console.log('Sending request to server...');
             
             const response = await fetch('http://localhost:3003/api/users/new', {
                 method: 'POST',
                 body: formDataToSend,
-                timeout: 30000, // 30 secondes de timeout
-                // No need to set Content-Type header, browser will set it automatically
+                timeout: 30000,
             });
     
             console.log('Response received:', response.status, response.statusText);
     
-            // Check if the response is ok (status in the range 200-299)
             if (!response.ok) {
-                throw new Error(`Server responded with status: ${response.status}`);
+                const errorData = await response.json();
+                throw new Error(errorData.error || `Server responded with status: ${response.status}`);
             }
     
-            // Parse response text for more details
             const responseText = await response.text();
             console.log('Response Text:', responseText);
     
-            // Try to parse the response as JSON
             let data;
             try {
                 data = JSON.parse(responseText);
@@ -90,6 +179,7 @@ const Register = () => {
                 lastName: '',
                 email: '',
                 password: '',
+                confirmPassword: '',
                 phone: '',
                 genre: "Homme",
                 departement: "Mascara",
@@ -102,13 +192,10 @@ const Register = () => {
             console.error('Error during form submission:', error);
             
             if (error.message.includes('NetworkError') || error.message.includes('Failed to fetch')) {
-                // Détection spécifique d'erreur réseau
                 setError("Problème de connexion réseau. Votre inscription a peut-être été traitée, mais nous n'avons pas pu recevoir la confirmation.");
                 
-                // Vous pourriez vérifier si l'utilisateur existe déjà après un court délai
                 setTimeout(async () => {
                     try {
-                        // Vérifiez si l'utilisateur existe dans la base de données
                         const checkResponse = await fetch(`http://localhost:3003/api/users/check-email?email=${formData.email}`);
                         const checkData = await checkResponse.json();
                         
@@ -126,9 +213,31 @@ const Register = () => {
         }
     };
 
-    // Function to close the modal
     const closeModal = () => {
         setShowSuccessModal(false);
+        navigate('/', { replace: true });
+    };
+    
+    // Fonction helper pour afficher les erreurs de validation d'un champ
+    const renderFieldError = (fieldName) => {
+        if (!validationErrors[fieldName]) return null;
+        
+        if (Array.isArray(validationErrors[fieldName])) {
+            return (
+                <ul className="field-error-list">
+                    {validationErrors[fieldName].map((err, index) => (
+                        <li key={index}>{err}</li>
+                    ))}
+                </ul>
+            );
+        }
+        
+        return <p className="field-error">{validationErrors[fieldName]}</p>;
+    };
+
+    // Style pour les messages d'erreur des champs
+    const errorFieldStyle = {
+        border: '1px solid #ff4d4f'
     };
 
     return (
@@ -170,7 +279,7 @@ const Register = () => {
                         <option value="user">User</option>
                     </select>
                 </div>
-                <div className="form-group">
+                <div className="form-group">    
                     <label htmlFor="firstName">Prénom :</label>
                     <input
                         type="text"
@@ -201,7 +310,9 @@ const Register = () => {
                         value={formData.email}
                         onChange={handleChange}
                         required
+                        style={validationErrors.email ? errorFieldStyle : {}}
                     />
+                    {renderFieldError('email')}
                 </div>
                 <div className="form-group">
                     <label htmlFor="password">Mot de passe :</label>
@@ -212,7 +323,22 @@ const Register = () => {
                         value={formData.password}
                         onChange={handleChange}
                         required
+                        style={validationErrors.password ? errorFieldStyle : {}}
                     />
+                    {renderFieldError('password')}
+                </div>
+                <div className="form-group">
+                    <label htmlFor="confirmPassword">Confirmer le mot de passe :</label>
+                    <input
+                        type="password"
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        value={formData.confirmPassword}
+                        onChange={handleChange}
+                        required
+                        style={validationErrors.confirmPassword ? errorFieldStyle : {}}
+                    />
+                    {renderFieldError('confirmPassword')}
                 </div>
                 <div className="form-group">
                     <label htmlFor="phone">Numéro de téléphone :</label>
@@ -224,7 +350,9 @@ const Register = () => {
                         onChange={handleChange}
                         placeholder="Entrez votre numéro de téléphone en précisant l'indicatif."
                         required
+                        style={validationErrors.phone ? errorFieldStyle : {}}
                     />
+                    {renderFieldError('phone')}
                 </div>
                 <div className="form-group">
                     <label htmlFor="genre">Genre :</label>

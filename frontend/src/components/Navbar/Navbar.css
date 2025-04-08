@@ -1,5 +1,16 @@
-
 .navbar {
     text-align: center;
     padding: 5px;
+}
+
+.navbar button {
+    margin: 0 5px;
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.logout-button {
+    background-color: red;
+    color: white;
+    font-weight: bold;
 }

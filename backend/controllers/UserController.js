@@ -3,7 +3,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const bcrypt = require('bcrypt'); 
-const { check } = require("express-validator");
+const { check, validationResult } = require("express-validator");
 
 // Configure multer storage
 const storage = multer.diskStorage({
@@ -35,6 +35,40 @@ const upload = multer({
   }
 }).array('photos', 5); // Allow up to 5 photos
 
+// Fonction pour valider le mot de passe
+const validatePassword = (password) => {
+  // Définir les règles de validation
+  const minLength = 8;
+  const hasUpperCase = /[A-Z]/.test(password);
+  const hasLowerCase = /[a-z]/.test(password);
+  const hasNumbers = /\d/.test(password);
+  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+  
+  const errors = [];
+  
+  if (password.length < minLength) {
+    errors.push(`Le mot de passe doit contenir au moins ${minLength} caractères`);
+  }
+  
+  if (!hasUpperCase) {
+    errors.push("Le mot de passe doit contenir au moins une lettre majuscule");
+  }
+  
+  if (!hasLowerCase) {
+    errors.push("Le mot de passe doit contenir au moins une lettre minuscule");
+  }
+  
+  if (!hasNumbers) {
+    errors.push("Le mot de passe doit contenir au moins un chiffre");
+  }
+  
+  if (!hasSpecialChar) {
+    errors.push("Le mot de passe doit contenir au moins un caractère spécial (!@#$%^&*(),.?\":{}|<>)");
+  }
+  
+  return errors;
+};
+
 // Créer un utilisateur
 const createUser = async (req, res) => {
   try {
@@ -58,9 +92,13 @@ const createUser = async (req, res) => {
       // Handle file uploads
       const photoPaths = req.files ? req.files.map(file => file.path.split('uploads')[1]) : [];
 
-      // Validate password
-      if (!req.body.password || req.body.password.length < 6) {
-          return res.status(400).json({ error: "Le mot de passe doit contenir au moins 6 caractères" });
+      // Valider le mot de passe avec la nouvelle fonction
+      const passwordErrors = validatePassword(req.body.password);
+      if (passwordErrors.length > 0) {
+          return res.status(400).json({ 
+              error: "Le mot de passe ne respecte pas les critères de sécurité", 
+              details: passwordErrors 
+          });
       }
 
       // Hacher le mot de passe avant de le stocker
@@ -170,9 +208,15 @@ const updateUser = async (req, res) => {
     const user = await User.findByPk(req.params.id);
     if (!user) return res.status(404).json({ error: "Utilisateur non trouvé" });
 
-    // Si le mot de passe est mis à jour, le hacher
-    
+    // Si le mot de passe est mis à jour, valider et hacher
     if (req.body.password) {
+      const passwordErrors = validatePassword(req.body.password);
+      if (passwordErrors.length > 0) {
+        return res.status(400).json({ 
+          error: "Le mot de passe ne respecte pas les critères de sécurité", 
+          details: passwordErrors 
+        });
+      }
       req.body.password = await bcrypt.hash(req.body.password, 10);
     }
 
