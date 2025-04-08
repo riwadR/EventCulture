@@ -1,5 +1,57 @@
+/* Style général du header */
+header {
+    background-color: #FAF0E3; /* beige très clair */
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: Arial, sans-serif;
+    border-bottom: 1px solid #e5e5e5;
+}
 
-.navbar {
-    text-align: center;
-    padding: 5px;
+/* Style du logo */
+.logo img {
+    height: 40px;
+    width: auto;
+}
+
+/* Style du menu de navigation */
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+    margin: 0;
+    padding: 0;
+    align-items: center;
+}
+
+nav ul li {
+    font-size: 16px;
+    color: #333;
+    cursor: pointer;
+}
+
+nav ul li:hover {
+    color: #000;
+}
+
+/* Boutons Login et Register */
+.buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.buttons button {
+    background-color: #DFAE92;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.buttons button:hover {
+    background-color: #CF987C;
 }
