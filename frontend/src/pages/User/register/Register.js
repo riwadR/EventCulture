@@ -1,17 +1,63 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import "./Register.css";
+import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
-        role: 'admin',
+        role: 'user',
         firstName: '',
         lastName: '',
         email: '',
         password: '',
+        confirmPassword: '', // Ajout de la confirmation du mot de passe
         phone: '',
         genre: "Homme",
         departement: "Mascara",
         participation: "Exposition uniquement",
+        autreParticipation:''
     });
+
+    const [photos, setPhotos] = useState([]);
+    const [error, setError] = useState(null);
+    const [validationErrors, setValidationErrors] = useState({});
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+    // Règles de validation du mot de passe
+    const passwordRules = {
+        minLength: 8,
+        requireUppercase: true,
+        requireLowercase: true,
+        requireNumbers: true,
+        requireSpecialChars: true
+    };
+
+    // Fonction pour valider le mot de passe
+    const validatePassword = (password) => {
+        const errors = [];
+        
+        if (password.length < passwordRules.minLength) {
+            errors.push(`Le mot de passe doit contenir au moins ${passwordRules.minLength} caractères`);
+        }
+        
+        if (passwordRules.requireUppercase && !/[A-Z]/.test(password)) {
+            errors.push("Le mot de passe doit contenir au moins une lettre majuscule");
+        }
+        
+        if (passwordRules.requireLowercase && !/[a-z]/.test(password)) {
+            errors.push("Le mot de passe doit contenir au moins une lettre minuscule");
+        }
+        
+        if (passwordRules.requireNumbers && !/[0-9]/.test(password)) {
+            errors.push("Le mot de passe doit contenir au moins un chiffre");
+        }
+        
+        if (passwordRules.requireSpecialChars && !/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+            errors.push("Le mot de passe doit contenir au moins un caractère spécial (!@#$%^&*(),.?\":{}|<>)");
+        }
+        
+        return errors;
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -19,36 +65,207 @@ const Register = () => {
             ...formData,
             [name]: value,
         });
+        
+        // Effacer l'erreur spécifique lorsque l'utilisateur modifie un champ
+        if (validationErrors[name]) {
+            setValidationErrors({
+                ...validationErrors,
+                [name]: null
+            });
+        }
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    // Valider le formulaire avant soumission
+    const validateForm = () => {
+        const errors = {};
         
-        fetch('http://localhost:3001/api/users/new', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData),
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Registration successful');
-                } else {
-                    alert('Registration failed');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred');
+        // Valider l'email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.email)) {
+            errors.email = "Veuillez entrer une adresse email valide";
+        }
+        
+        // Valider le mot de passe
+        const passwordErrors = validatePassword(formData.password);
+        if (passwordErrors.length > 0) {
+            errors.password = passwordErrors;
+        }
+        
+        // Vérifier que les mots de passe correspondent
+        if (formData.password !== formData.confirmPassword) {
+            errors.confirmPassword = "Les mots de passe ne correspondent pas";
+        }
+        
+        // Valider le numéro de téléphone (format international recommandé)
+        const phoneRegex = /^\+?[0-9]{10,15}$/;
+        if (!phoneRegex.test(formData.phone.replace(/\s/g, ''))) {
+            errors.phone = "Veuillez entrer un numéro de téléphone valide (format international recommandé: +XXX XXXXXXXXX)";
+        }
+        
+        return errors;
+    };
+
+    const handleFileChange = (e) => {
+        setPhotos([...e.target.files]);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError(null);
+        
+        // Valider le formulaire
+        const formErrors = validateForm();
+        if (Object.keys(formErrors).length > 0) {
+            setValidationErrors(formErrors);
+            // Trouver la première erreur pour l'afficher globalement
+            const firstError = Object.values(formErrors).find(error => error);
+            setError(Array.isArray(firstError) ? firstError[0] : firstError);
+            return;
+        }
+        
+        // Réinitialiser les erreurs de validation
+        setValidationErrors({});
+    
+        // Create FormData object
+        const formDataToSend = new FormData();
+        
+        // Append text fields (exclure confirmPassword)
+        Object.keys(formData).forEach(key => {
+            if (key !== 'confirmPassword') {
+                formDataToSend.append(key, formData[key]);
+            }
+        });
+    
+        // Append photos
+        photos.forEach((photo, index) => {
+            formDataToSend.append('photos', photo);
+        });
+    
+        try {
+            console.log('Sending request to server...');
+            
+            const response = await fetch('http://localhost:3003/api/users/new', {
+                method: 'POST',
+                body: formDataToSend,
+                timeout: 30000,
             });
+    
+            console.log('Response received:', response.status, response.statusText);
+    
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || `Server responded with status: ${response.status}`);
+            }
+    
+            const responseText = await response.text();
+            console.log('Response Text:', responseText);
+    
+            let data;
+            try {
+                data = JSON.parse(responseText);
+            } catch (parseError) {
+                console.error('Failed to parse response:', parseError);
+                setError(`Unexpected server response format: ${responseText.substring(0, 100)}...`);
+                return;
+            }
+    
+            // Show success modal
+            setShowSuccessModal(true);
+            
+            // Reset form
+            setFormData({
+                role: 'user',
+                firstName: '',
+                lastName: '',
+                email: '',
+                password: '',
+                confirmPassword: '',
+                phone: '',
+                genre: "Homme",
+                departement: "Mascara",
+                participation: "Exposition uniquement",
+                autreParticipation: ''
+            });
+            setPhotos([]);
+            
+        } catch (error) {
+            console.error('Error during form submission:', error);
+            
+            if (error.message.includes('NetworkError') || error.message.includes('Failed to fetch')) {
+                setError("Problème de connexion réseau. Votre inscription a peut-être été traitée, mais nous n'avons pas pu recevoir la confirmation.");
+                
+                setTimeout(async () => {
+                    try {
+                        const checkResponse = await fetch(`http://localhost:3003/api/users/check-email?email=${formData.email}`);
+                        const checkData = await checkResponse.json();
+                        
+                        if (checkData.exists) {
+                            setShowSuccessModal(true);
+                            setError(null);
+                        }
+                    } catch (e) {
+                        console.error("Couldn't verify user creation:", e);
+                    }
+                }, 2000);
+            } else {
+                setError(`Erreur: ${error.message}`);
+            }
+        }
+    };
+
+    const closeModal = () => {
+        setShowSuccessModal(false);
+        navigate('/', { replace: true });
+    };
+    
+    // Fonction helper pour afficher les erreurs de validation d'un champ
+    const renderFieldError = (fieldName) => {
+        if (!validationErrors[fieldName]) return null;
+        
+        if (Array.isArray(validationErrors[fieldName])) {
+            return (
+                <ul className="field-error-list">
+                    {validationErrors[fieldName].map((err, index) => (
+                        <li key={index}>{err}</li>
+                    ))}
+                </ul>
+            );
+        }
+        
+        return <p className="field-error">{validationErrors[fieldName]}</p>;
+    };
+
+    // Style pour les messages d'erreur des champs
+    const errorFieldStyle = {
+        border: '1px solid #ff4d4f'
     };
 
     return (
         <div className="register-page">
-            <h2>Register</h2>
-            <form onSubmit={handleSubmit}>
+            <h2>Inscription</h2>
+            
+            {/* Success Modal */}
+            {showSuccessModal && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h3>Inscription réussie</h3>
+                        </div>
+                        <div className="modal-body">
+                            <p>Votre compte a été créé avec succès!</p>
+                            <p>Vous pouvez maintenant vous connecter avec vos identifiants.</p>
+                        </div>
+                        <div className="modal-footer">
+                            <button onClick={closeModal} className="modal-button">Fermer</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Error message display */}
+            {error && <div className="error-message">{error}</div>}
+            
+            <form onSubmit={handleSubmit} encType="multipart/form-data">
                 <div className="form-group">
                     <label htmlFor="role">Role:</label>
                     <select
@@ -62,8 +279,8 @@ const Register = () => {
                         <option value="user">User</option>
                     </select>
                 </div>
-                <div className="form-group">
-                    <label htmlFor="firstName">First Name:</label>
+                <div className="form-group">    
+                    <label htmlFor="firstName">Prénom :</label>
                     <input
                         type="text"
                         id="firstName"
@@ -74,7 +291,7 @@ const Register = () => {
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="lastName">Last Name:</label>
+                    <label htmlFor="lastName">Nom de famille :</label>
                     <input
                         type="text"
                         id="lastName"
@@ -85,7 +302,7 @@ const Register = () => {
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="email">Email:</label>
+                    <label htmlFor="email">Adresse Email :</label>
                     <input
                         type="email"
                         id="email"
@@ -93,10 +310,12 @@ const Register = () => {
                         value={formData.email}
                         onChange={handleChange}
                         required
+                        style={validationErrors.email ? errorFieldStyle : {}}
                     />
+                    {renderFieldError('email')}
                 </div>
                 <div className="form-group">
-                    <label htmlFor="password">Password:</label>
+                    <label htmlFor="password">Mot de passe :</label>
                     <input
                         type="password"
                         id="password"
@@ -104,21 +323,39 @@ const Register = () => {
                         value={formData.password}
                         onChange={handleChange}
                         required
+                        style={validationErrors.password ? errorFieldStyle : {}}
                     />
+                    {renderFieldError('password')}
                 </div>
                 <div className="form-group">
-                    <label htmlFor="phone">Phone:</label>
+                    <label htmlFor="confirmPassword">Confirmer le mot de passe :</label>
+                    <input
+                        type="password"
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        value={formData.confirmPassword}
+                        onChange={handleChange}
+                        required
+                        style={validationErrors.confirmPassword ? errorFieldStyle : {}}
+                    />
+                    {renderFieldError('confirmPassword')}
+                </div>
+                <div className="form-group">
+                    <label htmlFor="phone">Numéro de téléphone :</label>
                     <input
                         type="text"
                         id="phone"
                         name="phone"
                         value={formData.phone}
                         onChange={handleChange}
+                        placeholder="Entrez votre numéro de téléphone en précisant l'indicatif."
                         required
+                        style={validationErrors.phone ? errorFieldStyle : {}}
                     />
+                    {renderFieldError('phone')}
                 </div>
                 <div className="form-group">
-                    <label htmlFor="genre">Genre:</label>
+                    <label htmlFor="genre">Genre :</label>
                     <select
                         id="genre"
                         name="genre"
@@ -175,7 +412,7 @@ const Register = () => {
                     </select>
                 </div>
                 <div className="form-group">
-                    <label htmlFor="participation">Participation:</label>
+                    <label htmlFor="participation">Participation :</label>
                     <select
                         id="participation"
                         name="participation"
@@ -188,7 +425,34 @@ const Register = () => {
                         <option value="Atelier et exposition">Atelier et exposition</option>
                     </select>
                 </div>
-                <button type="submit">Register</button>
+
+                <div className="form-group">
+                    <label htmlFor="autreParticipation">Autre participation :</label>
+                    <input
+                        id="autreParticipation"
+                        name="autreParticipation"
+                        value={formData.autreParticipation}
+                        onChange={handleChange}
+                        placeholder="Décrivez ici vos éventuelles autres participations (optionnel)."
+                    />
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="photos">Photos (optionnel) :</label>
+                    <input
+                        type="file"
+                        id="photos"
+                        name="photos"
+                        multiple
+                        accept="image/*"
+                        onChange={handleFileChange}
+                    />
+                    {photos.length > 0 && (
+                        <p>{photos.length} fichier(s) sélectionné(s)</p>
+                    )}
+                </div>
+                
+                <button type="submit">Inscription</button>
             </form>
         </div>
     );
