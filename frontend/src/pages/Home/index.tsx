@@ -1,44 +1,60 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Button from '../../components/common/Button';
 import Card from '../../components/common/Card';
 import { ROUTES } from '../../config/routes';
+import { getAllEvents } from '../../services/eventService';
 import './Home.scss';
-
-interface Event {
-  id: number;
-  title: string;
-  date: string;
-  location: string;
-  image: string;
-  description: string;
-}
+import Event from '../../models/Event';
 
 const HomePage: React.FC = () => {
+
+  const [events, setEvents] = useState<Event[]>([]);
+
+    useEffect(() => {
+    const fetchEvents = async (): Promise<void> => {
+      try {
+        const allEvents = await getAllEvents();
+        setEvents(allEvents);
+        console.log('Événements récupérés:', allEvents);
+      } catch (error) {
+        console.error('Erreur lors de la récupération des événements', error);
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
   const featuredEvents: Event[] = [
     {
-      id: 1,
-      title: 'Festival de Jazz',
-      date: '15-20 juin 2023',
-      location: 'Paris',
-      image: 'https://via.placeholder.com/300x200?text=Jazz+Festival',
-      description: 'Le plus grand festival de jazz de France avec des artistes internationaux.',
+      id_event: 1, 
+      type: "type", 
+      titre: "titre", 
+      description: 'desc', 
+      dateDebut: '08-2023', 
+      dateFin: '08-2023', 
+      id_lieu: 1, 
+      id_createur: 1
     },
     {
-      id: 2,
-      title: 'Exposition d\'Art Moderne',
-      date: '1-30 juillet 2023',
-      location: 'Lyon',
-      image: 'https://via.placeholder.com/300x200?text=Art+Exhibition',
-      description: 'Une exposition unique présentant les œuvres des plus grands artistes contemporains.',
+      id_event: 2, 
+      type: "type", 
+      titre: "titre2", 
+      description: 'desc', 
+      dateDebut: '08-2023', 
+      dateFin: '08-2023', 
+      id_lieu: 1, 
+      id_createur: 1
     },
     {
-      id: 3,
-      title: 'Concert Symphonique',
-      date: '10 août 2023',
-      location: 'Marseille',
-      image: 'https://via.placeholder.com/300x200?text=Symphony+Concert',
-      description: 'Un concert exceptionnel avec l\'orchestre philharmonique de Marseille.',
+      id_event: 3, 
+      type: "type3", 
+      titre: "titre", 
+      description: 'desc', 
+      dateDebut: '08-2023', 
+      dateFin: '08-2023', 
+      id_lieu: 1, 
+      id_createur: 1
     },
   ];
 
@@ -78,17 +94,17 @@ const HomePage: React.FC = () => {
           <div className="featured-events__grid">
             {featuredEvents.map((event) => (
               <Card
-                key={event.id}
+                key={event.id_event}
                 className="event-card"
-                title={event.title}
-                subtitle={`${event.date} | ${event.location}`}
+                title={event.titre}
+                subtitle={`${event.dateDebut} | ${event.id_lieu}`}
               >
                 <div className="event-card__image">
-                  <img src={event.image} alt={event.title} />
+                  {/* <img src={event.image} alt={event.title} /> */}
                 </div>
                 <p className="event-card__description">{event.description}</p>
                 <div className="event-card__footer">
-                  <Link to={`${ROUTES.EVENTS}/${event.id}`}>
+                  <Link to={`${ROUTES.EVENTS}/${event.id_event}`}>
                     <Button variant="outline" size="small">
                       Voir les détails
                     </Button>
