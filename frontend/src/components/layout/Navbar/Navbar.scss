@@ -15,12 +15,12 @@ header {
     cursor: pointer;
 }
 
-.logo-text {
-    font-size: 40px;
-    font-weight: bold;
-    color: var(--color-text);
+.logo-img {
+    width: 4rem;
+    height: 4rem;
+    background-size: cover;
+    background-position: center;
     cursor: pointer;
-    font-family: 'Arial', sans-serif;
 }
 
 nav {
