@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3000/api/catalogues';
+const API_URL = 'http://localhost:3001/api/catalogues';
 
 const getAllCatalogues = async () => {
   const response = await axios.get(API_URL);

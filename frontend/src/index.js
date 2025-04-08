@@ -2,45 +2,29 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
-import { BrowserRouter, Routes, Route } from 'react-router';
-import Formulaire from './pages/Formulaire/Formulaire';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar/Navbar';
-
-import CatalogueList from './pages/Catalogue/List/CatalogueList';
-import CatalogueNew from './pages/Catalogue/New/CatalogueNew';
-import CatalogueUpdate from './pages/Catalogue/Update/CatalogueUpdate';
-
-import EventList from './pages/Event/List/EventList.js';
-import EventForm from './pages/Event/New-Update/EventForm';
-
-import Login from './pages/User/login/Login.js';
-import Register from './pages/User/register/Register.js';
+import { AuthProvider } from './contexts/AuthContext';
+// Importez vos composants'=
+import Login from './pages/User/login/Login'; // Ajustez le chemin selon votre structure
+import Register from './pages/User/register/Register'; // Ajustez le chemin selon votre structure
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
-
 root.render(
-  <BrowserRouter>
-
-    <Navbar />
-
-    <Routes>
-      <Route path="/" element={<App />} />
-      <Route path="/formulaire" element={<Formulaire />} />
-
-      // Catalogue
-      <Route path="/catalogue" element={<CatalogueList />} />
-      <Route path="/catalogue/new" element={<CatalogueNew />} />
-      <Route path="/catalogue/update/:id" element={<CatalogueUpdate />} />
-
-      // Event
-      <Route path="/event" element={<EventList />} />
-      <Route path="/event/new" element={<EventForm />} />
-      <Route path="/event/update/:id" element={<EventForm />} />
-
-      {/* User */}
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-
-    </Routes>
-  </BrowserRouter>
+  <React.StrictMode>
+    <BrowserRouter>
+      <AuthProvider>
+        <div>
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<App />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/catalogues" element={<div>Page de catalogues</div>} />
+            <Route path="/events" element={<div>Page d'événements</div>} />
+          </Routes>
+        </div>
+      </AuthProvider>
+    </BrowserRouter>
+  </React.StrictMode>
 );

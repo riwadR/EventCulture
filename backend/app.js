@@ -1,6 +1,30 @@
 const express = require("express");
+const cors = require("cors");
+const helmet = require("helmet");
 const dotenv = require("dotenv");
 const sequelize = require("./config/database");
+const path = require("path");
+const findFreePort = require("find-free-port");
+const app = express();
+
+// Chargement des variables d'environnement
+dotenv.config();
+
+// CORS middleware first
+app.use(cors({
+  origin: ['http://localhost:3000'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization', ]
+}));
+
+// Security middleware
+app.use(helmet());
+
+// Parsing middlewares - order matters
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Importation des routes
 const userRoutes = require("./routes/userRoutes");
 const catalogueRoutes = require("./routes/catalogueRoutes");
 const commentaireRoutes = require("./routes/commentaireRoutes");
@@ -12,34 +36,56 @@ const parcoursRoutes = require("./routes/parcoursRoutes");
 const parcoursLieuxRoutes = require("./routes/parcoursLieuxRoutes");
 const programmeRoutes = require("./routes/programmeRoutes");
 const oeuvreRoutes = require("./routes/oeuvreRoutes");
-const cors = require('cors');
 
-dotenv.config();
+// Définition des routes
+app.use("/api/users", userRoutes);
+app.use("/api/events", eventRoutes);
+app.use("/api/programmes", programmeRoutes);
+app.use("/api/lieux", lieuRoutes);
+app.use("/api/catalogues", catalogueRoutes);
+app.use("/api/commentaires", commentaireRoutes);
+app.use("/api/medias", mediaRoutes);
+app.use("/api/parcours", parcoursRoutes);
+app.use("/api/parcoursLieux", parcoursLieuxRoutes);
+app.use("/api/participants", participantRoutes);
+app.use("/api/oeuvres", oeuvreRoutes);
 
-const app = express();
-app.use(express.json())
-.use(cors())
-.use("/api/users", userRoutes) // Utiliser les routes User
-.use("/api/events", eventRoutes) // Utiliser les routes event
-.use("/api/programmes", programmeRoutes) // Utiliser les routes programme
-.use("/api/lieux", lieuRoutes) // Utiliser les routes lieu
-.use("/api/catalogues", catalogueRoutes) // Utiliser les routes catalogues
-.use("/api/commentaires", commentaireRoutes) // Utiliser les routes commentaire
-.use("/api/medias", mediaRoutes) // Utiliser les routes media
-.use("/api/parcours", parcoursRoutes) // Utiliser les routes parcours
-.use("/api/parcoursLieux", parcoursLieuxRoutes) // Utiliser les routes parcoursLieux
-.use("api/participants", participantRoutes) // Utiliser les routes participants
-.use("/api/oeuvres", oeuvreRoutes); // Utiliser les routes oeuvre
+// Serve static files
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Logging middleware
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  next();
+});
 
 
-// Synchroniser la base de données
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ 
+    message: 'Une erreur est survenue', 
+    error: process.env.NODE_ENV === 'production' ? 'Erreur interne du serveur' : err.message 
+  });
+});
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ message: 'Route non trouvée' });
+});
+
+// Synchronisation de la base de données
 sequelize.sync({ alter: true })
-  .then(() => {
-    console.log("Base de données synchronisée.");
-  })
+  .then(() => console.log("Base de données synchronisée."))
   .catch((err) => console.error("Erreur de synchronisation :", err));
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Serveur démarré sur http://localhost:${PORT}`);
+// Trouver un port libre et démarrer le serveur
+findFreePort(3003).then(([port]) => {
+  app.listen(port, () => {
+    console.log(`✅ Serveur démarré sur http://localhost:${port}`);
+  });
+}).catch(err => {
+  console.error("❌ Impossible de trouver un port libre :", err);
 });
+
+module.exports = app;

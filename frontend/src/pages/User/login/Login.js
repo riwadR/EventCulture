@@ -1,9 +1,14 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../contexts/AuthContext"; // Ajustez le chemin selon votre structure
 import "./Login.css";
 
 const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const navigate = useNavigate();
+    // Récupérer la fonction login du contexte
+    const { login } = useAuth();
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -12,25 +17,35 @@ const Login = () => {
             password,
         };
 
-        fetch("http://localhost:3001/api/users/login", {
+        fetch("http://localhost:3003/api/users/login", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify(request),
         })
-            .then((response) => response.json())
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('Erreur lors de la connexion');
+                }
+                return response.json();
+            })
             .then((data) => {
                 console.log("Success:", data);
+                // Activer l'état authentifié
+                login();
+                // Redirection vers la racine après une connexion réussie
+                navigate('/'); 
             })
             .catch((error) => {
                 console.error("Error:", error);
+                alert('Erreur de connexion: ' + error.message);
             });
     };
 
     return (
         <div className="login-container">
-            <h2>Login</h2>
+            <h2>Connexion</h2>
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
                     <label htmlFor="email">Email:</label>
@@ -52,7 +67,7 @@ const Login = () => {
                         required
                     />
                 </div>
-                <button type="submit">Login</button>
+                <button type="submit">Connexion</button>
             </form>
         </div>
     );

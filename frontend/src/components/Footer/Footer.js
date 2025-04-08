@@ -1,7 +1,16 @@
 import React from "react";
+import { useNavigate } from "react-router";
 import "./Footer.css";
 
 const Footer = () => {
+  const navigate = useNavigate();
+
+  const buttons = [
+    { name: "À propos", path: "/about" },
+    { name: "Contact", path: "/contact" },
+    { name: "Mentions légales", path: "/legal" },
+  ];
+
   return (
     <footer className="footer">
       <div className="footer-content">
@@ -9,9 +18,11 @@ const Footer = () => {
           &copy; {new Date().getFullYear()} Eventculture. Tous droits réservés.
         </p>
         <div className="footer-links">
-          <a href="/about">À propos</a>
-          <a href="/contact">Contact</a>
-          <a href="/legal">Mentions légales</a>
+          {buttons.map((button, index) => (
+            <button key={index} onClick={() => navigate(button.path)}>
+              {button.name}
+            </button>
+          ))}
         </div>
       </div>
     </footer>
