@@ -11,8 +11,9 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 
 // Pages
 import HomePage from './pages/Home';
-// import AboutPage from './pages/About';
-// import ContactPage from './pages/Contact';
+import AboutPage from './pages/Footer/About/About';
+import ContactPage from './pages/Footer/Contact/Contact';
+import Legal from './pages/Footer/Legal/Legal';
 import Login from './pages/User/login/Login';
 import Register from './pages/User/register/Register';
 // import ProfilePage from './pages/Profile';
@@ -42,6 +43,9 @@ const App: React.FC = () => {
                       <EventList />
                     </ProtectedRoute>
                   } />
+                  <Route path={ROUTES.ABOUT} element={<AboutPage />} />
+                  <Route path={ROUTES.CONTACT} element={<ContactPage />} />
+                  <Route path={ROUTES.LEGAL} element={<Legal />} />
                   {/* <Route path={ROUTES.EVENT_DETAILS} element={<EventDetailsPage />} /> */}
                   <Route path={ROUTES.LOGIN} element={<Login />} />
                   <Route path={ROUTES.REGISTER} element={<Register />} />

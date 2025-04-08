@@ -20,7 +20,7 @@ interface OeuvreInput {
     id_catalogue?: number;
 }
 
-const API_URL = 'http://localhost:3000/api/oeuvres';
+const API_URL = 'http://localhost:3001/api/oeuvres';
 
 const getAllOeuvres = async (): Promise<Oeuvre[]> => {
     const response = await axios.get(API_URL);

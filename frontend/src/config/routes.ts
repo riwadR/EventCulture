@@ -2,6 +2,7 @@ export const ROUTES = {
   HOME: '/',
   ABOUT: '/about',
   CONTACT: '/contact',
+  LEGAL: '/legal',
   EVENTS: '/events',
   EVENT_DETAILS: '/event/:id',
   LOGIN: '/login',
@@ -17,6 +18,9 @@ export const PUBLIC_ROUTES: RoutePath[] = [
   ROUTES.HOME,
   ROUTES.ABOUT,
   ROUTES.CONTACT,
+  ROUTES.LEGAL,
+  ROUTES.EVENTS,
+  ROUTES.EVENT_DETAILS,
   ROUTES.LOGIN,
   ROUTES.REGISTER,
 ];
