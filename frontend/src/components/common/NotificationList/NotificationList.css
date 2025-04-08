@@ -1,0 +1,32 @@
+.notification-list {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  max-width: 400px;
+  width: 100%;
+}
+
+.notification-list__item {
+  margin-bottom: 10px;
+  animation: slide-in 0.3s ease-out forwards;
+}
+
+@keyframes slide-in {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 576px) {
+  .notification-list {
+    max-width: 90%;
+    top: 10px;
+    right: 10px;
+  }
+} 

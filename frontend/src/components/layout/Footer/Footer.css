@@ -1,0 +1,28 @@
+.footer {
+    background-color:#E3DDCE; /* vert écologique */
+    color: #333333;
+    padding: 20px 0;
+    text-align: center;
+    font-size: 14px;
+  }
+  
+  .footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+  }
+  
+  .footer-links {
+    margin-top: 10px;
+  }
+  
+  .footer-links a {
+    color: #c8e6c9;
+    margin: 0 10px;
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  
+  .footer-links button:hover {
+    text-decoration: underline;
+  }

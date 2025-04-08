@@ -1,0 +1,35 @@
+.not-found {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 70vh;
+  text-align: center;
+  padding: 2rem;
+}
+
+.not-found__container {
+  max-width: 500px;
+}
+
+.not-found__code {
+  font-size: 8rem;
+  font-weight: 700;
+  color: #007bff;
+  margin-bottom: 1rem;
+  line-height: 1;
+}
+
+.not-found__title {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.not-found__message {
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.not-found__actions {
+  margin-top: 2rem;
+} 

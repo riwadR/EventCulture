@@ -36,6 +36,7 @@ const parcoursRoutes = require("./routes/parcoursRoutes");
 const parcoursLieuxRoutes = require("./routes/parcoursLieuxRoutes");
 const programmeRoutes = require("./routes/programmeRoutes");
 const oeuvreRoutes = require("./routes/oeuvreRoutes");
+const authRoutes = require("./routes/authRoutes");
 
 // Définition des routes
 app.use("/api/users", userRoutes);
@@ -49,6 +50,7 @@ app.use("/api/parcours", parcoursRoutes);
 app.use("/api/parcoursLieux", parcoursLieuxRoutes);
 app.use("/api/participants", participantRoutes);
 app.use("/api/oeuvres", oeuvreRoutes);
+app.use("/api/auth", authRoutes);
 
 // Serve static files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -80,7 +82,7 @@ sequelize.sync({ alter: true })
   .catch((err) => console.error("Erreur de synchronisation :", err));
 
 // Trouver un port libre et démarrer le serveur
-findFreePort(3003).then(([port]) => {
+findFreePort(3001).then(([port]) => {
   app.listen(port, () => {
     console.log(`✅ Serveur démarré sur http://localhost:${port}`);
   });
