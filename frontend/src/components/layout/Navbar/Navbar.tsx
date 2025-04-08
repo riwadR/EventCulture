@@ -13,18 +13,12 @@ const Navbar: React.FC = () => {
   // Utiliser le contexte d'authentification
   const { isAuthenticated, logout } = useAuth();
 
-  // Définir les boutons en fonction de l'état d'authentification
-  const buttons: NavButton[] = [
+  const navItems: NavButton[] = [
     { name: 'Accueil', path: '/' },
-    ...(isAuthenticated 
-      ? [{ name: 'Mon profil', path: '/' }] 
-      : [
-          { name: 'Inscription', path: '/register' },
-          { name: 'Connexion', path: '/login' }
-        ]
-    ),
     { name: 'Catalogue', path: '/catalogues' },
-    { name: 'Event', path: '/events' },
+    { name: 'Evènement', path: '/events' },
+    { name: 'Présentation', path: '/presentation' },
+    { name: 'Parcours', path: '/parcours' },
   ];
 
   const handleClick = (path: string): void => {
@@ -37,25 +31,32 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <div className="navbar">
+    <header>
+      <div className="logo">
+        <span className="logo-text" onClick={() => navigate('/')}>EP</span>
+      </div>
+
       <nav>
-        {buttons.map((button, index) => (
-          <button key={index} onClick={() => handleClick(button.path)}>
-            {button.name}
-          </button>
-        ))}
-        
-        {/* Bouton de déconnexion affiché uniquement si authentifié */}
-        {isAuthenticated && (
-          <button 
-            onClick={handleLogout}
-            style={{ backgroundColor: 'red', color: 'white' }}
-          >
-            Déconnexion
-          </button>
-        )}
+        <ul>
+          {navItems.map((item, index) => (
+            <li key={index} onClick={() => handleClick(item.path)}>
+              {item.name}
+            </li>
+          ))}
+        </ul>
+
+        <div className="buttons">
+          {isAuthenticated ? (
+            <button onClick={handleLogout}>Déconnexion</button>
+          ) : (
+            <>
+              <button onClick={() => navigate('/login')}>Connexion</button>
+              <button onClick={() => navigate('/register')}>Inscription</button>
+            </>
+          )}
+        </div>
       </nav>
-    </div>
+    </header>
   );
 };
 

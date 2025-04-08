@@ -4,7 +4,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import NotificationList from './components/common/NotificationList/NotificationList';
-import Navbar from './components/layout/Navbar';
+import Navbar from './components/layout/Navbar/Navbar';
 import Footer from './components/layout/Footer';
 import { ROUTES } from './config/routes';
 import ProtectedRoute from './components/auth/ProtectedRoute';

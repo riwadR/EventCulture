@@ -46,18 +46,32 @@ const HomePage: React.FC = () => {
     <div className="home-page">
       <section className="hero">
         <div className="hero__content">
-          <h1 className="hero__title">Découvrez les meilleurs événements culturels</h1>
-          <p className="hero__subtitle">
-            Trouvez des concerts, expositions, festivals et bien plus encore dans votre région
-          </p>
-          <div className="hero__actions">
-            <Link to={ROUTES.EVENTS}>
-              <Button size="large">Explorer les événements</Button>
-            </Link>
-          </div>
+          <h1 className="hero__title">Art & Âme d'AURES</h1>
         </div>
       </section>
 
+      <section className="presentation">
+        <div className='presentation__img' style={{ backgroundImage: `url(https://media.discordapp.net/attachments/1359154159940669591/1359156371446042855/image.png?ex=67f67482&is=67f52302&hm=eafbc2cfe0464707ea53714274a58e9e263173cb85af3fb7e83b2fbf7c5e5920&=&format=webp&quality=lossless&width=1936&height=1402)` }}></div>
+        <div className="presentation__content">
+          <h2 className="presentation__title">Présentation</h2>
+          <h3 className="presentation__subheading">Subheading</h3>
+          <p className="presentation__body-text">
+            Body text for your whole article or post. We'll put in some lorem
+            ipsum to show how a filled-out page might look:
+          </p>
+          <p className="presentation__detailed-text">
+            Excepteur efficient emerging, minim veniam anim aute carefully
+            curated Ginza conversation exquisite perfect nostrud nisi
+            intricate Content. Qui international first-class nulla ut. Punctual
+            adipisicing, essential lovely queen tempor eiusmod irure.
+            Exclusive izakaya charming Scandinavian impeccable aute
+            quality of life soft power pariatur Melbourne occaecat
+            discerning. Qui wardrobe aliquip, et Porter destination Toto
+            remarkable officia Helsinki excepteur Basset hound. Zürich
+            sleepy perfect consectetur.
+          </p>
+        </div>
+      </section>
       <section className="featured-events">
         <div className="container">
           <h2 className="section-title">Événements à la une</h2>
