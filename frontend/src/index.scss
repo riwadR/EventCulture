@@ -33,11 +33,12 @@
 }
 
 .dark-mode {
-  --color-background: #121212;
-  --color-text: #e0e0e0;
-  --color-text-secondary: #a0a0a0;
-  --color-border: #333333;
-  --color-gray-light: #1e1e1e;
+  --color-button-primary: #CC8866B3;
+  
+  --color-background: #ffffff;
+  --color-text: #333333;
+  --color-text-secondary: #FAF7F2;
+  --color-border: #dcdcdc;
 }
 
 * {
