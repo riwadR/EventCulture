@@ -72,7 +72,7 @@ const login = async (req, res) => {
     }
 
     // Générer un token JWT
-    const token = generateToken(user.id);
+    const token = generateToken(user.id_user);
 
     // Supprimer le mot de passe de la réponse
     const { password: _, ...userWithoutPassword } = user.toJSON();

@@ -27,7 +27,5 @@ export const PUBLIC_ROUTES: RoutePath[] = [
 
 export const PRIVATE_ROUTES: RoutePath[] = [
   ROUTES.PROFILE,
-  ROUTES.EVENTS,
-  ROUTES.EVENT_DETAILS,
   ROUTES.CATALOGUES,
 ]; 
