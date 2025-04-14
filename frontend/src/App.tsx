@@ -38,11 +38,7 @@ const App: React.FC = () => {
                   <Route path={ROUTES.HOME} element={<HomePage />} />
                   {/* <Route path={ROUTES.ABOUT} element={<AboutPage />} /> */}
                   {/* <Route path={ROUTES.CONTACT} element={<ContactPage />} /> */}
-                  <Route path={ROUTES.EVENTS} element={
-                    <ProtectedRoute>
-                      <EventList />
-                    </ProtectedRoute>
-                  } />
+                  <Route path={ROUTES.EVENTS} element={<EventList />} />
                   <Route path={ROUTES.ABOUT} element={<AboutPage />} />
                   <Route path={ROUTES.CONTACT} element={<ContactPage />} />
                   <Route path={ROUTES.LEGAL} element={<Legal />} />
