@@ -35,7 +35,7 @@ const App: React.FC = () => {
           <NotificationProvider>
             <div className="app">
               <Navbar />
-              <main className="main-content">
+              <main className="main-contents">
                 <NotificationList />
                 <Routes>
                   <Route path={ROUTES.HOME} element={<HomePage />} />
