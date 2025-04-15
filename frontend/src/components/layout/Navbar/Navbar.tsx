@@ -12,8 +12,7 @@ const Navbar: React.FC = () => {
   const navigate = useNavigate();
   // Utiliser le contexte d'authentification
   const { isAuthenticated, logout } = useAuth();
-  console.log(isAuthenticated);
-  
+
   const navItems: NavButton[] = [
     { name: 'Accueil', path: '/' },
     // { name: 'Catalogue', path: '/catalogues' },
