@@ -82,7 +82,7 @@ sequelize.sync({ alter: true })
   .catch((err) => console.error("Erreur de synchronisation :", err));
 
 // Trouver un port libre et démarrer le serveur
-findFreePort(3001).then(([port]) => {
+findFreePort(process.env.PORT).then(([port]) => {
   app.listen(port, () => {
     console.log(`✅ Serveur démarré sur http://localhost:${port}`);
   });
