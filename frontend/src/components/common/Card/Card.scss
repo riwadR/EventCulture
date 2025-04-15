@@ -45,6 +45,8 @@
 }
 
 .card__content {
+  flex-grow: 1;
+  display: flex;
   padding: 16px;
 }
 
