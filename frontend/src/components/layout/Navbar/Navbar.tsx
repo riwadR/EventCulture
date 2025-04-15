@@ -34,7 +34,7 @@ const Navbar: React.FC = () => {
   return (
     <header>
       <div className="logo">
-        <div className="logo-img" onClick={() => navigate('/')} style={{ backgroundImage: `url(https://cdn.discordapp.com/attachments/1359154159940669591/1359162977743540394/Agir-removebg-preview.png?ex=67fdbae9&is=67fc6969&hm=1903a02a5a0bfe6476c5b192c854793afb754cce60572e1beeaf842de52e59d8&)` }}></div>
+        <div className="logo-img" onClick={() => navigate('/')} style={{ backgroundImage: `url(/images/logo.png)` }}></div>
       </div>
 
       <nav>

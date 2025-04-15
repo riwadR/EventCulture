@@ -26,14 +26,14 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="home-page">
-      <section className="hero">
+      <section className="hero" style={{ background: `linear-gradient(rgba(211, 211, 211, 0.5), rgba(211, 211, 211, 0.5)), url('/images/home.png') no-repeat center center` }}>
         <div className="hero__content">
           <h1 className="hero__title">Art & Âme d'AURES</h1>
         </div>
       </section>
 
       <section className="presentation">
-        <div className='presentation__img' style={{ backgroundImage: `url(https://cdn.discordapp.com/attachments/1359154159940669591/1359154174142709930/image.png?ex=67fdb2b6&is=67fc6136&hm=12e7af497323e95d3478be5f2ea73a7e0b1df24d1f29a7f08c3df8a5e5761816&)` }}></div>
+        <div className='presentation__img' style={{ backgroundImage: `url(/images/welcome.png)` }}></div>
         <div className="presentation__content">
           <h2 className="presentation__title">Bienvenue sur le site officiel d’Agir Villages Aurès</h2>
           <h3 className="presentation__subheading">Cultivons l’avenir, ensemble.</h3>
