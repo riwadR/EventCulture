@@ -69,22 +69,13 @@ const HomePage: React.FC = () => {
       <section className="presentation">
         <div className='presentation__img' style={{ backgroundImage: `url(https://media.discordapp.net/attachments/1359154159940669591/1359156371446042855/image.png?ex=67f67482&is=67f52302&hm=eafbc2cfe0464707ea53714274a58e9e263173cb85af3fb7e83b2fbf7c5e5920&=&format=webp&quality=lossless&width=1936&height=1402)` }}></div>
         <div className="presentation__content">
-          <h2 className="presentation__title">Présentation</h2>
-          <h3 className="presentation__subheading">Subheading</h3>
+          <h2 className="presentation__title">Bienvenue sur le site officiel d’Agir Villages Aurès</h2>
+          <h3 className="presentation__subheading">Cultivons l’avenir, ensemble.</h3>
           <p className="presentation__body-text">
-            Body text for your whole article or post. We'll put in some lorem
-            ipsum to show how a filled-out page might look:
+          Agir Villages Aurès est bien plus qu’un projet : c’est un mouvement collectif pour réinventer nos territoires, valoriser les savoirs locaux, et bâtir des ponts entre patrimoine, jeunesse et innovation.
           </p>
           <p className="presentation__detailed-text">
-            Excepteur efficient emerging, minim veniam anim aute carefully
-            curated Ginza conversation exquisite perfect nostrud nisi
-            intricate Content. Qui international first-class nulla ut. Punctual
-            adipisicing, essential lovely queen tempor eiusmod irure.
-            Exclusive izakaya charming Scandinavian impeccable aute
-            quality of life soft power pariatur Melbourne occaecat
-            discerning. Qui wardrobe aliquip, et Porter destination Toto
-            remarkable officia Helsinki excepteur Basset hound. Zürich
-            sleepy perfect consectetur.
+          À travers nos chantiers-écoles, nos événements culturels, et nos initiatives citoyennes, nous redonnons vie aux villages de l’Aurès en impliquant leurs forces vives : les jeunes, les artistes, les artisans, les institutions et les habitants eux-mêmes.
           </p>
         </div>
       </section>
@@ -124,11 +115,9 @@ const HomePage: React.FC = () => {
       <section className="about-section">
         <div className="container">
           <div className="about-section__content">
-            <h2 className="section-title">À propos d'EventCulture</h2>
+            <h2 className="section-title">À propos</h2>
             <p>
-              EventCulture est votre plateforme dédiée à la découverte d'événements culturels.
-              Notre mission est de vous connecter aux meilleurs concerts, expositions, festivals et
-              spectacles dans votre région et partout en France.
+            Agir Villages Aurès est une initiative citoyenne et culturelle qui vise à revitaliser les villages de l’Aurès en valorisant leur patrimoine, en impliquant les habitants et en créant des ponts entre tradition et innovation. À travers des chantiers-écoles, des événements artistiques et des actions collaboratives, le projet offre aux jeunes et aux communautés locales un espace d’apprentissage, de création et de transmission. Porté par un collectif engagé, Agir Villages Aurès encourage une dynamique territoriale durable, inclusive et participative, où chaque acteur devient moteur du changement.
             </p>
             <Link to={ROUTES.ABOUT}>
               <Button variant="outline">En savoir plus</Button>
