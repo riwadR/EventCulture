@@ -12,7 +12,7 @@ dotenv.config();
 
 // CORS middleware first
 app.use(cors({
-  origin: ['http://localhost:3000'],
+  origin: ['http://localhost:' + process.env.PORT],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization', ]
 }));

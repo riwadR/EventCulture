@@ -11,7 +11,7 @@ interface EventInput {
   id_createur: number | null;
 }
 
-const apiUrl = 'http://localhost:3001/api/events'; // URL to your Node.js API
+const apiUrl = process.env.REACT_APP_API_URL + '/events';
 
 // Create a new event
 export const createEvent = async (eventData: EventInput): Promise<Event> => {

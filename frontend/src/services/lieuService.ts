@@ -8,7 +8,7 @@ interface LieuInput {
   pays: string;
 }
 
-const API_URL = 'http://localhost:3001/api/lieux';
+const API_URL = process.env.REACT_APP_API_URL + '/lieux';
 
 const getAllLieux = async (): Promise<Lieu[]> => {
   const response = await axios.get(API_URL);

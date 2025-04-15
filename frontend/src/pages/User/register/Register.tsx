@@ -168,7 +168,7 @@ const Register: React.FC = () => {
         try {
             console.log('Sending request to server...');
             
-            const response = await fetch('http://localhost:3001/api/users/new', {
+            const response = await fetch(process.env.REACT_APP_API_URL + '/users/new', {
                 method: 'POST',
                 body: formDataToSend,
             });
@@ -219,7 +219,7 @@ const Register: React.FC = () => {
                 
                 setTimeout(async () => {
                     try {
-                        const checkResponse = await fetch(`http://localhost:3001/api/users/check-email?email=${formData.email}`);
+                        const checkResponse = await fetch(process.env.REACT_APP_API_URL + '/users/check-email?email=' + formData.email);
                         const checkData = await checkResponse.json();
                         
                         if (checkData.exists) {

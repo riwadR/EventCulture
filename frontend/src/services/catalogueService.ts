@@ -7,7 +7,7 @@ interface CatalogueInput {
   id_event?: number;
 }
 
-const API_URL = 'http://localhost:3001/api/catalogues';
+const API_URL = process.env.REACT_APP_API_URL + '/catalogues';
 
 const getAllCatalogues = async (): Promise<Catalogue[]> => {
   const response = await axios.get(API_URL);
