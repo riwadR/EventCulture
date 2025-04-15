@@ -19,6 +19,7 @@ const Navbar: React.FC = () => {
     { name: 'Evènement', path: '/events' },
     { name: 'Présentation', path: '/presentation' },
     { name: 'Parcours', path: '/parcours' },
+    { name: 'Lieux', path:  'lieux'},
   ];
 
   const handleClick = (path: string): void => {

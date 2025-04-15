@@ -24,6 +24,9 @@ import './index.scss';
 import CatalogueList from './pages/Catalogue/List/CatalogueList';
 import EventList from './pages/Event/List/EventList';
 
+// Formulaire(s) d'ajout de données
+import LieuForm from './pages/Lieu/New-Update/LieuForm';
+
 const App: React.FC = () => {
   return (
     <Router>
@@ -45,6 +48,7 @@ const App: React.FC = () => {
                   {/* <Route path={ROUTES.EVENT_DETAILS} element={<EventDetailsPage />} /> */}
                   <Route path={ROUTES.LOGIN} element={<Login />} />
                   <Route path={ROUTES.REGISTER} element={<Register />} />
+                  <Route path={ROUTES.LIEUX} element={<LieuForm />} />
                   {/* <Route path={ROUTES.PROFILE} element={<ProfilePage />} /> */}
                   <Route path={ROUTES.CATALOGUES} element={
                     <ProtectedRoute>

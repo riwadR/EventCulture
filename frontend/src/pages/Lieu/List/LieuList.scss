@@ -1,0 +1,52 @@
+.lieu-list-container {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  max-width: 800px;
+  margin: 20px auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.lieu-list-container h3 {
+  text-align: center;
+  color: #CC8866B3;
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+}
+
+.lieu-list-loading,
+.lieu-list-error,
+.lieu-list-empty {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #777;
+}
+
+.lieu-list {
+  list-style: none;
+  padding: 0;
+}
+
+.lieu-item {
+  background-color: #f8f9fa;
+  margin-bottom: 15px;
+  padding: 15px;
+  border-radius: 6px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.lieu-item strong {
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.lieu-item span {
+  display: block;
+  font-size: 1rem;
+  color: #555;
+}
+
+.lieu-item:hover {
+  background-color: #f1f1f1;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}

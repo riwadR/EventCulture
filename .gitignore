@@ -4,3 +4,4 @@ backend/uploads
 # Ignorer les fichiers package-lock.json
 package-lock.json
 */package-lock.json
+backend/config/
