@@ -15,10 +15,10 @@ const Navbar: React.FC = () => {
 
   const navItems: NavButton[] = [
     { name: 'Accueil', path: '/' },
-    { name: 'Catalogue', path: '/catalogues' },
+    // { name: 'Catalogue', path: '/catalogues' },
     { name: 'Evènements', path: '/events' },
     { name: 'Présentation', path: '/presentation' },
-    { name: 'Parcours', path: '/parcours' },
+    // { name: 'Parcours', path: '/parcours' },
     { name: 'Lieux', path:  'lieux'},
   ];
 
