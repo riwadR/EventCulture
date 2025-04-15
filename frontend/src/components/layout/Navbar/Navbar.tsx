@@ -16,7 +16,7 @@ const Navbar: React.FC = () => {
   const navItems: NavButton[] = [
     { name: 'Accueil', path: '/' },
     { name: 'Catalogue', path: '/catalogues' },
-    { name: 'Evènement', path: '/events' },
+    { name: 'Evènements', path: '/events' },
     { name: 'Présentation', path: '/presentation' },
     { name: 'Parcours', path: '/parcours' },
   ];
@@ -33,7 +33,7 @@ const Navbar: React.FC = () => {
   return (
     <header>
       <div className="logo">
-        <div className="logo-img" onClick={() => navigate('/')} style={{ backgroundImage: `url(https://media.discordapp.net/attachments/1359154159940669591/1359162977743540394/Agir-removebg-preview.png?ex=67f67aa9&is=67f52929&hm=518cbd34dc94ed277a5419eada663eae280e43dc5a8613ee76e6f92db092bc15&=&format=webp&quality=lossless&width=1026&height=752)` }}></div>
+        <div className="logo-img" onClick={() => navigate('/')} style={{ backgroundImage: `url(https://cdn.discordapp.com/attachments/1359154159940669591/1359162977743540394/Agir-removebg-preview.png?ex=67fdbae9&is=67fc6969&hm=1903a02a5a0bfe6476c5b192c854793afb754cce60572e1beeaf842de52e59d8&)` }}></div>
       </div>
 
       <nav>

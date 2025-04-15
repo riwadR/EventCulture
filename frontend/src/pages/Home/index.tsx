@@ -11,12 +11,11 @@ const HomePage: React.FC = () => {
 
   const [events, setEvents] = useState<Event[]>([]);
 
-    useEffect(() => {
+  useEffect(() => {
     const fetchEvents = async (): Promise<void> => {
       try {
         const allEvents = await getAllEvents();
         setEvents(allEvents);
-        console.log('Événements récupérés:', allEvents);
       } catch (error) {
         console.error('Erreur lors de la récupération des événements', error);
       }
@@ -24,39 +23,6 @@ const HomePage: React.FC = () => {
 
     fetchEvents();
   }, []);
-
-  const featuredEvents: Event[] = [
-    {
-      id_event: 1, 
-      type: "type", 
-      titre: "titre", 
-      description: 'desc', 
-      dateDebut: '08-2023', 
-      dateFin: '08-2023', 
-      id_lieu: 1, 
-      id_createur: 1
-    },
-    {
-      id_event: 2, 
-      type: "type", 
-      titre: "titre2", 
-      description: 'desc', 
-      dateDebut: '08-2023', 
-      dateFin: '08-2023', 
-      id_lieu: 1, 
-      id_createur: 1
-    },
-    {
-      id_event: 3, 
-      type: "type3", 
-      titre: "titre", 
-      description: 'desc', 
-      dateDebut: '08-2023', 
-      dateFin: '08-2023', 
-      id_lieu: 1, 
-      id_createur: 1
-    },
-  ];
 
   return (
     <div className="home-page">
@@ -67,7 +33,7 @@ const HomePage: React.FC = () => {
       </section>
 
       <section className="presentation">
-        <div className='presentation__img' style={{ backgroundImage: `url(https://media.discordapp.net/attachments/1359154159940669591/1359156371446042855/image.png?ex=67f67482&is=67f52302&hm=eafbc2cfe0464707ea53714274a58e9e263173cb85af3fb7e83b2fbf7c5e5920&=&format=webp&quality=lossless&width=1936&height=1402)` }}></div>
+        <div className='presentation__img' style={{ backgroundImage: `url(https://cdn.discordapp.com/attachments/1359154159940669591/1359154174142709930/image.png?ex=67fdb2b6&is=67fc6136&hm=12e7af497323e95d3478be5f2ea73a7e0b1df24d1f29a7f08c3df8a5e5761816&)` }}></div>
         <div className="presentation__content">
           <h2 className="presentation__title">Bienvenue sur le site officiel d’Agir Villages Aurès</h2>
           <h3 className="presentation__subheading">Cultivons l’avenir, ensemble.</h3>
@@ -83,22 +49,20 @@ const HomePage: React.FC = () => {
         <div className="container">
           <h2 className="section-title">Événements à la une</h2>
           <div className="featured-events__grid">
-            {featuredEvents.map((event) => (
+            {events.slice(0, 3).map((event) => (
               <Card
-                key={event.id_event}
                 className="event-card"
-                title={event.titre}
-                subtitle={`${event.dateDebut} | ${event.id_lieu}`}
               >
                 <div className="event-card__image">
-                  {/* <img src={event.image} alt={event.title} /> */}
+                  <img src="https://cdn.discordapp.com/attachments/1359154159940669591/1359154174142709930/image.png?ex=67fdb2b6&is=67fc6136&hm=12e7af497323e95d3478be5f2ea73a7e0b1df24d1f29a7f08c3df8a5e5761816&" alt={event.titre} />
                 </div>
-                <p className="event-card__description">{event.description}</p>
+                <div className="event-card__details">
+                  <p className='event-card_title'>{event.titre}</p>
+                  <p className="event-card__description">{event.description}</p>
+                </div>
                 <div className="event-card__footer">
                   <Link to={`${ROUTES.EVENTS}/${event.id_event}`}>
-                    <Button variant="outline" size="small">
-                      Voir les détails
-                    </Button>
+                    <Button variant="secondary">Voir l'événement</Button>
                   </Link>
                 </div>
               </Card>
