@@ -12,7 +12,7 @@ dotenv.config();
 
 // CORS middleware first
 app.use(cors({
-  origin: ['http://localhost:' + process.env.PORT, 'https://agirvillagesaures.fr'],
+  origin: ['http://localhost:' + process.env.PORT, 'http://localhost:3000', 'https://agirvillagesaures.fr'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization', ]
 }));
