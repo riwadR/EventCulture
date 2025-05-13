@@ -38,10 +38,10 @@ const HomePage: React.FC = () => {
           <h2 className="presentation__title">Bienvenue sur le site officiel d’Agir Villages Aurès</h2>
           <h3 className="presentation__subheading">Cultivons l’avenir, ensemble.</h3>
           <p className="presentation__body-text">
-          Agir Villages Aurès est bien plus qu’un projet : c’est un mouvement collectif pour réinventer nos territoires, valoriser les savoirs locaux, et bâtir des ponts entre patrimoine, jeunesse et innovation.
+            Agir Villages Aurès est bien plus qu’un projet : c’est un mouvement collectif pour réinventer nos territoires, valoriser les savoirs locaux, et bâtir des ponts entre patrimoine, jeunesse et innovation.
           </p>
           <p className="presentation__detailed-text">
-          À travers nos chantiers-écoles, nos événements culturels, et nos initiatives citoyennes, nous redonnons vie aux villages de l’Aurès en impliquant leurs forces vives : les jeunes, les artistes, les artisans, les institutions et les habitants eux-mêmes.
+            À travers nos chantiers-écoles, nos événements culturels, et nos initiatives citoyennes, nous redonnons vie aux villages de l’Aurès en impliquant leurs forces vives : les jeunes, les artistes, les artisans, les institutions et les habitants eux-mêmes.
           </p>
         </div>
       </section>
@@ -61,7 +61,7 @@ const HomePage: React.FC = () => {
                   <p className="event-card__description">{event.description}</p>
                 </div>
                 <div className="event-card__footer">
-                  <Link to={`${ROUTES.EVENTS}/${event.id_event}`}>
+                  <Link to={`/event/${event.id_event}`}>
                     <Button variant="secondary">Voir l'événement</Button>
                   </Link>
                 </div>
@@ -81,7 +81,7 @@ const HomePage: React.FC = () => {
           <div className="about-section__content">
             <h2 className="section-title">À propos</h2>
             <p>
-            Agir Villages Aurès est une initiative citoyenne et culturelle qui vise à revitaliser les villages de l’Aurès en valorisant leur patrimoine, en impliquant les habitants et en créant des ponts entre tradition et innovation. À travers des chantiers-écoles, des événements artistiques et des actions collaboratives, le projet offre aux jeunes et aux communautés locales un espace d’apprentissage, de création et de transmission. Porté par un collectif engagé, Agir Villages Aurès encourage une dynamique territoriale durable, inclusive et participative, où chaque acteur devient moteur du changement.
+              Agir Villages Aurès est une initiative citoyenne et culturelle qui vise à revitaliser les villages de l’Aurès en valorisant leur patrimoine, en impliquant les habitants et en créant des ponts entre tradition et innovation. À travers des chantiers-écoles, des événements artistiques et des actions collaboratives, le projet offre aux jeunes et aux communautés locales un espace d’apprentissage, de création et de transmission. Porté par un collectif engagé, Agir Villages Aurès encourage une dynamique territoriale durable, inclusive et participative, où chaque acteur devient moteur du changement.
             </p>
             <Link to={ROUTES.ABOUT}>
               <Button variant="outline">En savoir plus</Button>

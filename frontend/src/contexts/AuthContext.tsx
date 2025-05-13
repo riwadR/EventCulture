@@ -117,4 +117,12 @@ export const useAuth = (): AuthContextType => {
     return context;
 };
 
+export const useIsAdmin = (): boolean => {
+    const context = useContext(AuthContext);
+    if (context === undefined) {
+        throw new Error('useAuth must be used within an AuthProvider');
+    }
+    return context.user?.role === 'admin';
+}
+
 export default AuthContext; 

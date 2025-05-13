@@ -16,13 +16,14 @@ import ContactPage from './pages/Footer/Contact/Contact';
 import Legal from './pages/Footer/Legal/Legal';
 import Login from './pages/User/login/Login';
 import Register from './pages/User/register/Register';
+import EventList from './pages/Event/List/EventList';
+import Event from './pages/Event/Event';
 // import ProfilePage from './pages/Profile';
 import NotFoundPage from './pages/NotFound';
 
 // Styles globaux
 import './index.scss';
 import CatalogueList from './pages/Catalogue/List/CatalogueList';
-import EventList from './pages/Event/List/EventList';
 
 // Formulaire(s) d'ajout de données
 import LieuForm from './pages/Lieu/New-Update/LieuForm';
@@ -45,7 +46,7 @@ const App: React.FC = () => {
                   <Route path={ROUTES.ABOUT} element={<AboutPage />} />
                   <Route path={ROUTES.CONTACT} element={<ContactPage />} />
                   <Route path={ROUTES.LEGAL} element={<Legal />} />
-                  {/* <Route path={ROUTES.EVENT_DETAILS} element={<EventDetailsPage />} /> */}
+                  <Route path={ROUTES.EVENT_DETAILS} element={<Event />} />
                   <Route path={ROUTES.LOGIN} element={<Login />} />
                   <Route path={ROUTES.REGISTER} element={<Register />} />
                   <Route path={ROUTES.LIEUX} element={<LieuForm />} />
