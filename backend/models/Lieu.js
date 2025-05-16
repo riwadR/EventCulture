@@ -1,40 +1,14 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database.js");
+module.exports = (sequelize, DataTypes) => {
+  const Lieu = sequelize.define('Lieu', {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    nom: { type: DataTypes.STRING, allowNull: false },
+    adresse: { type: DataTypes.STRING, allowNull: false },
+    commune_id: { type: DataTypes.INTEGER, allowNull: false }
+  }, { tableName: 'lieu', timestamps: false });
 
-const Lieu = sequelize.define("Lieu", {
-  id_lieu: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-  },
-  nom: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    validate: {
-      notEmpty: true
-    }
-  },
-  adresse: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    validate: {
-      notEmpty: true
-    }
-  },
-  ville: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    validate: {
-      notEmpty: true
-    }
-  },
-  pays: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    validate: {
-      notEmpty: true
-    }
-  },
-});
+  Lieu.associate = (models) => {
+    Lieu.belongsTo(models.Commune, { foreignKey: 'commune_id' });
+  };
 
-module.exports = Lieu;
+  return Lieu;
+};
