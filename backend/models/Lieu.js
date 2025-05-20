@@ -1,3 +1,6 @@
+const { DataTypes } = require("sequelize");
+const sequelize = require("../config/database");
+
 module.exports = (sequelize, DataTypes) => {
   const Lieu = sequelize.define('Lieu', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
@@ -12,3 +15,4 @@ module.exports = (sequelize, DataTypes) => {
 
   return Lieu;
 };
+module.exports = Lieu;

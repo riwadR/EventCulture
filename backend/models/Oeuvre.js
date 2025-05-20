@@ -1,50 +1,52 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
-const User = require('./User');
 
-const Oeuvre = sequelize.define('Oeuvre', {
+// models/Oeuvre.js
+module.exports = (sequelize, DataTypes) => {
+  const Oeuvre = sequelize.define('Oeuvre', {
     id_oeuvre: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
     },
     titre: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        validate: {
-            notEmpty: true
-        }
+      type: DataTypes.STRING(255),
+      allowNull: false
     },
-    type: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        validate: {
-            notEmpty: true
-        }
+    id_type_oeuvre: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    annee_creation: {
+      type: DataTypes.INTEGER
     },
     description: {
-        type: DataTypes.STRING,
-        allowNull: true
+      type: DataTypes.TEXT
     },
-    prix: {
-        type: DataTypes.FLOAT,
-        allowNull: false
-    },
-    image: {
-        type: DataTypes.STRING, // Stocke l'URL de l'image
-        allowNull: false, // On autorise pas une Oeuvre sans image.
-        validate: {
-            isUrl: true, // Vérifie que la valeur est une URL valide
-        }
-    },
-    id_createur: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-        references: {
-            model: User,
-            key: 'id_user'
-        }
-    } 
-});
+    image_url: {
+      type: DataTypes.STRING(255)
+    }
+  }, {
+    tableName: 'Oeuvre',
+    createdAt: 'date_creation',
+    updatedAt: 'date_modification'
+  });
 
-module.exports = Oeuvre;
+  Oeuvre.associate = models => {
+    Oeuvre.belongsTo(models.TypeOeuvre, { foreignKey: 'id_type_oeuvre' });
+    Oeuvre.hasOne(models.Livre, { foreignKey: 'id_oeuvre' });
+    Oeuvre.hasOne(models.Film, { foreignKey: 'id_oeuvre' });
+    Oeuvre.hasOne(models.AlbumMusical, { foreignKey: 'id_oeuvre' });
+    Oeuvre.hasOne(models.OeuvreArt, { foreignKey: 'id_oeuvre' });
+    Oeuvre.hasOne(models.Artisanat, { foreignKey: 'id_oeuvre' });
+    Oeuvre.hasMany(models.Media, { foreignKey: 'id_oeuvre' });
+    Oeuvre.hasMany(models.CritiqueEvaluation, { foreignKey: 'id_oeuvre' });
+    Oeuvre.belongsToMany(models.Event, {
+      through: models.EvenementOeuvre,
+      foreignKey: 'id_oeuvre',
+      as: 'EvenementsPresentation'
+    });
+  };
+
+  return Oeuvre;
+};
