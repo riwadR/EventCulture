@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../../contexts/AuthContext"; // Ajustez le chemin selon votre structure
+import { useAuth } from "../../../contexts/AuthContext";
 import "./Navbar.scss";
 
 interface NavButton {
@@ -10,34 +10,45 @@ interface NavButton {
 
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
-  // Utiliser le contexte d'authentification
   const { isAuthenticated, logout } = useAuth();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navItems: NavButton[] = [
     { name: 'Accueil', path: '/' },
-    // { name: 'Catalogue', path: '/catalogues' },
     { name: 'Evènements', path: '/events' },
     { name: 'Présentation', path: '/presentation' },
-    // { name: 'Parcours', path: '/parcours' },
-    { name: 'Lieux', path:  'lieux'},
+    { name: 'Lieux', path: '/lieux' },
   ];
 
   const handleClick = (path: string): void => {
     navigate(path);
+    setIsMenuOpen(false); // Fermer le menu après clic
   };
 
   const handleLogout = (): void => {
     logout();
     navigate('/');
+    setIsMenuOpen(false);
   };
 
   return (
-    <header>
+    <header className="navbar">
       <div className="logo">
-        <div className="logo-img" onClick={() => navigate('/')} style={{ backgroundImage: `url(/images/logo.png)` }}></div>
+        <div
+          className="logo-img"
+          onClick={() => navigate('/')}
+          style={{ backgroundImage: `url(/images/logo.png)` }}
+        ></div>
       </div>
 
-      <nav>
+      {/* Burger icon */}
+      <div className="burger" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+
+      <nav className={isMenuOpen ? "open" : ""}>
         <ul>
           {navItems.map((item, index) => (
             <li key={index} onClick={() => handleClick(item.path)}>
