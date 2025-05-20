@@ -8,6 +8,7 @@ import Navbar from './components/layout/Navbar/Navbar';
 import Footer from './components/layout/Footer';
 import { ROUTES } from './config/routes';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import AdminRoute from './components/auth/AdminRoute';
 
 // Pages
 import HomePage from './pages/Home';
@@ -27,6 +28,9 @@ import CatalogueList from './pages/Catalogue/List/CatalogueList';
 
 // Formulaire(s) d'ajout de données
 import LieuForm from './pages/Lieu/New-Update/LieuForm';
+
+// ADMIN
+import AdminPage from './pages/Admin/Admin';
 
 const App: React.FC = () => {
   return (
@@ -56,6 +60,12 @@ const App: React.FC = () => {
                       <CatalogueList />
                     </ProtectedRoute>
                   } />
+                  <Route path={ROUTES.ADMIN} element={
+                    <AdminRoute>
+                      <AdminPage />
+                    </AdminRoute>
+                  } />
+                  {/* Routes protégées */}
                   <Route path="*" element={<NotFoundPage />} />
                 </Routes>
               </main>

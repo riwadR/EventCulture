@@ -1,23 +1,28 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../../contexts/AuthContext";
+import { useAuth, useIsAdmin } from "../../../contexts/AuthContext"; // Ajustez le chemin selon votre structure
 import "./Navbar.scss";
 
 interface NavButton {
   name: string;
   path: string;
+  adminRequired?: boolean;
 }
 
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const { isAuthenticated, logout } = useAuth();
+  const { isAdmin } = useIsAdmin();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
 
   const navItems: NavButton[] = [
     { name: 'Accueil', path: '/' },
     { name: 'Evènements', path: '/events' },
-    { name: 'Présentation', path: '/presentation' },
-    { name: 'Lieux', path: '/lieux' },
+    // { name: 'Présentation', path: '/presentation' },
+    // { name: 'Parcours', path: '/parcours' },
+    { name: 'Lieux', path:  'lieux', adminRequired: true },
+    {name: 'Administration', path: '/admin', adminRequired: true},
   ];
 
   const handleClick = (path: string): void => {
@@ -50,11 +55,16 @@ const Navbar: React.FC = () => {
 
       <nav className={isMenuOpen ? "open" : ""}>
         <ul>
-          {navItems.map((item, index) => (
-            <li key={index} onClick={() => handleClick(item.path)}>
+            {navItems.map((item, index) => {
+            if (item.adminRequired && !isAdmin) {
+              return null;
+            }
+            return (
+              <li key={index} onClick={() => handleClick(item.path)}>
               {item.name}
-            </li>
-          ))}
+              </li>
+            );
+            })}
         </ul>
 
         <div className="buttons">
