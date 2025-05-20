@@ -1,7 +1,6 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
-const Lieu = require("./Lieu");
-const User = require("./User");
+
 module.exports = (sequelize, DataTypes) => {
   const Evenement = sequelize.define('Evenement', {
     id_evenement: {
