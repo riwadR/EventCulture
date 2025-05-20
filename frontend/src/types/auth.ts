@@ -30,6 +30,7 @@ export interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  isAdmin: boolean;
   error: string | null;
   login: (email: string, password: string) => Promise<User>;
   register: (userData: RegisterData) => Promise<User>;

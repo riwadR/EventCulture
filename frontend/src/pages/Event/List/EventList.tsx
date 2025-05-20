@@ -20,7 +20,7 @@ const EventList: React.FC = () => {
     const [currentEvent, setCurrentEvent] = useState<EventModel | null>(null);
     const [isCreating, setIsCreating] = useState<boolean>(false);
     const { isAuthenticated, logout } = useAuth();
-    const isAdmin = useIsAdmin();
+    const { isAdmin } = useIsAdmin();
     const navigate = useNavigate();
 
     useEffect(() => {
