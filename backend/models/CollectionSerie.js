@@ -1,6 +1,6 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
-// Modèle CollectionSerie
+
+
+module.exports = (sequelize, DataTypes) => {
 const CollectionSerie = sequelize.define('CollectionSerie', {
   id_collection: {
     type: DataTypes.INTEGER,
@@ -18,8 +18,13 @@ const CollectionSerie = sequelize.define('CollectionSerie', {
     type: DataTypes.STRING(50)
   }
 }, {
-  tableName: 'Collection_Serie',
+  tableName: 'collection_serie',
   timestamps: false
 });
 
-export default CollectionSerie;
+// Si besoin d’associations, ajouter ici
+CollectionSerie.associate = function(models) {
+  // Exemple : CollectionSerie.hasMany(models.SomeModel, { foreignKey: 'id_collection_serie' });
+};
+
+return CollectionSerie; }

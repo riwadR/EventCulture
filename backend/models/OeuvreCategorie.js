@@ -1,37 +1,36 @@
+// models/OeuvreCategorie.js
 const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
-// Modèle OeuvreCategorie
 module.exports = (sequelize, DataTypes) => {
-  const OeuvreCategorie = sequelize.define('OeuvreCategorie', {
-    id_oeuvre: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      references: {
-        model: 'Oeuvre',
-        key: 'id_oeuvre'
-      },
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE'
+
+const OeuvreCategorie = sequelize.define('OeuvreCategorie', {
+  id_oeuvre: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    references: {
+      model: 'Oeuvre',
+      key: 'id_oeuvre'
     },
-    id_categorie: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      references: {
-        model: 'Categorie',
-        key: 'id_categorie'
-      },
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE'
-    }
-  }, {
-    tableName: 'OeuvreCategorie',
-    timestamps: false
-  });
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+  },
+  id_categorie: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    references: {
+      model: 'Categorie',
+      key: 'id_categorie'
+    },
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+  }
+}, {
+  tableName: 'OeuvreCategorie',
+  timestamps: false
+});
 
-  OeuvreCategorie.associate = (models) => {
-    OeuvreCategorie.belongsTo(models.Oeuvre, { foreignKey: 'id_oeuvre' });
-    OeuvreCategorie.belongsTo(models.Categorie, { foreignKey: 'id_categorie' });
-  };
-
-  return OeuvreCategorie;
+OeuvreCategorie.associate = models => {
+  OeuvreCategorie.belongsTo(models.Oeuvre, { foreignKey: 'id_oeuvre' });
+  OeuvreCategorie.belongsTo(models.Categorie, { foreignKey: 'id_categorie' });
 };
+
+return OeuvreCategorie; }

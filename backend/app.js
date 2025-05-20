@@ -7,6 +7,7 @@ const path = require("path");
 const findFreePort = require("find-free-port");
 const app = express();
 
+
 // Chargement des variables d'environnement
 dotenv.config();
 
@@ -26,12 +27,12 @@ app.use(express.urlencoded({ extended: true }));
 
 // Importation des routes
 const userRoutes = require("./routes/userRoutes");
-const catalogueRoutes = require("./routes/catalogueRoutes");
+
 const commentaireRoutes = require("./routes/commentaireRoutes");
 const eventRoutes = require("./routes/eventRoutes");
 const lieuRoutes = require("./routes/lieuRoutes");
 const mediaRoutes = require("./routes/mediaRoutes");
-const participantRoutes = require("./routes/participantRoutes");
+
 const parcoursRoutes = require("./routes/parcoursRoutes");
 const parcoursLieuxRoutes = require("./routes/parcoursLieuxRoutes");
 const programmeRoutes = require("./routes/programmeRoutes");
@@ -43,12 +44,12 @@ app.use("/api/users", userRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/programmes", programmeRoutes);
 app.use("/api/lieux", lieuRoutes);
-app.use("/api/catalogues", catalogueRoutes);
+
 app.use("/api/commentaires", commentaireRoutes);
 app.use("/api/medias", mediaRoutes);
 app.use("/api/parcours", parcoursRoutes);
 app.use("/api/parcoursLieux", parcoursLieuxRoutes);
-app.use("/api/participants", participantRoutes);
+
 app.use("/api/oeuvres", oeuvreRoutes);
 app.use("/api/auth", authRoutes);
 
@@ -75,7 +76,7 @@ app.use((err, req, res, next) => {
 app.use((req, res) => {
   res.status(404).json({ message: 'Route non trouvée' });
 });
-
+const models = require("./models");
 // Synchronisation de la base de données
 sequelize.sync({ alter: true })
   .then(() => console.log("Base de données synchronisée."))

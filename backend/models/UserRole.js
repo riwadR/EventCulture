@@ -1,19 +1,37 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
 module.exports = (sequelize, DataTypes) => {
-  const UserRole = sequelize.define('UserRole', {
+const UserRole = sequelize.define(
+  "UserRole",
+  {
     id_user: {
       type: DataTypes.INTEGER,
       primaryKey: true,
+      allowNull: false,
+      references: {
+        model: "User",
+        key: "id_user",
+      },
+      onDelete: "CASCADE",
     },
     id_role: {
       type: DataTypes.INTEGER,
       primaryKey: true,
-    }
-  }, {
-    tableName: 'User_Role',
-    timestamps: false
-  });
+      allowNull: false,
+      references: {
+        model: "Role",
+        key: "id_role",
+      },
+      onDelete: "CASCADE",
+    },
+  },
+  {
+    tableName: "User_Role",
+    timestamps: false,
+  }
+);
 
-  return UserRole;
+UserRole.associate = (models) => {
+  UserRole.belongsTo(models.User, { foreignKey: "id_user" });
+  UserRole.belongsTo(models.Role, { foreignKey: "id_role" });
 };
+
+return UserRole; }

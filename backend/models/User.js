@@ -1,48 +1,72 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
+
 module.exports = (sequelize, DataTypes) => {
-  const User = sequelize.define('User', {
+const User = sequelize.define(
+  "User",
+  {
     id_user: {
       type: DataTypes.INTEGER,
       primaryKey: true,
-      autoIncrement: true
+      autoIncrement: true,
     },
     nom: {
       type: DataTypes.STRING(100),
-      allowNull: false
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+        len: [1, 100],
+      },
     },
     prenom: {
       type: DataTypes.STRING(100),
-      allowNull: false
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+        len: [1, 100],
+      },
     },
     date_naissance: {
-      type: DataTypes.DATEONLY
+      type: DataTypes.DATEONLY,
+      validate: {
+        isDate: true,
+        isBefore: new Date().toISOString().split("T")[0],
+      },
     },
     nationalite: {
-      type: DataTypes.STRING(50)
+      type: DataTypes.STRING(50),
     },
     biographie: {
-      type: DataTypes.TEXT
+      type: DataTypes.TEXT,
     },
     photo_url: {
-      type: DataTypes.STRING(255)
-    }
-  }, {
-    tableName: 'User',
-    createdAt: 'date_creation',
-    updatedAt: 'date_modification'
+      type: DataTypes.STRING(255),
+      validate: {
+        isUrl: true,
+      },
+    },
+  },
+  {
+    tableName: "User",
+    createdAt: "date_creation",
+    updatedAt: "date_modification",
+  }
+);
+
+User.associate = (models) => {
+  User.belongsToMany(models.Role, {
+    through: models.UserRole,
+    foreignKey: "id_user",
+    onDelete: "CASCADE",
   });
-
-  User.associate = models => {
-    User.belongsToMany(models.Role, { through: models.UserRole, foreignKey: 'id_user' });
-    User.belongsToMany(models.Evenement, {
-      through: models.EvenementUser,
-      foreignKey: 'id_user',
-      as: 'EvenementsParticipes'
-    });
-    User.hasMany(models.EvenementUser, { foreignKey: 'id_user' });
-    User.hasMany(models.EvenementOeuvre, { foreignKey: 'id_user' });
-  };
-
-  return User;
+  User.belongsToMany(models.Evenement, {
+    through: models.EvenementUser,
+    foreignKey: "id_user",
+    as: "EvenementsParticipes",
+    onDelete: "CASCADE",
+  });
+  User.hasMany(models.EvenementOeuvre, {
+    foreignKey: "id_presentateur",
+    as: "Presentations",
+  });
 };
+
+return User; }
