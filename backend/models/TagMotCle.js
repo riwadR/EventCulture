@@ -1,22 +1,26 @@
 module.exports = (sequelize, DataTypes) => {
-const TagMotCle = sequelize.define('TagMotCle', {
+  const TagMotCle = sequelize.define('TagMotCle', {
     id_tag: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true
     },
-    mot_cle: {
-      type: DataTypes.STRING(50),
+    nom: {
+      type: DataTypes.STRING,
       allowNull: false
-    },
-    type: {
-      type: DataTypes.STRING(50)
     }
   }, {
-    tableName: 'Tag_Mot_Cle',
+    tableName: 'TagMotCle',
     timestamps: false
   });
 
- 
+  TagMotCle.associate = function(models) {
+    TagMotCle.belongsToMany(models.Oeuvre, {
+      through: 'Oeuvre_Tag',
+      foreignKey: 'id_tag',
+      otherKey: 'id_oeuvre'
+    });
+  };
 
-return TagMotCle; }
+  return TagMotCle;
+};

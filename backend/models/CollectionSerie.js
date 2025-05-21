@@ -1,5 +1,3 @@
-
-
 module.exports = (sequelize, DataTypes) => {
 const CollectionSerie = sequelize.define('CollectionSerie', {
   id_collection: {

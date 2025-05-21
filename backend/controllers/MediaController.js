@@ -1,73 +1,71 @@
-const Media = require('../models/Media');
+const { Media } = require('../models');
 
-// Créer un nouveau média
-const createMedia = async (req, res) => {
+exports.getAllMedia = async (req, res) => {
   try {
-    const { id_event, id_programme, id_catalog, type_media, url_media } = req.body;
-    const newMedia = await Media.create({ id_event, id_programme, id_catalog, type_media, url_media });
-    res.status(201).json({ message: 'Média créé avec succès', media: newMedia });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Erreur lors de la création du média' });
-  }
-};
-
-// Obtenir tous les médias
-const getAllMedia = async (req, res) => {
-  try {
-    const media = await Media.findAll();
+    const media = await Media.findAll({
+      include: [{ model: Media.associations.Oeuvre }]
+    });
     res.status(200).json(media);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Erreur lors de la récupération des médias' });
+    res.status(500).json({ error: 'Erreur lors de la récupération des médias' });
   }
 };
 
-// Obtenir un média par son ID
-const getMediaById = async (req, res) => {
-  const { id } = req.params;
+exports.getMediaById = async (req, res) => {
   try {
-    const media = await Media.findByPk(id);
-    if (!media) {
-      return res.status(404).json({ message: 'Média non trouvé' });
+    const media = await Media.findByPk(req.params.id, {
+      include: [{ model: Media.associations.Oeuvre }]
+    });
+    if (media) {
+      res.status(200).json(media);
+    } else {
+      res.status(404).json({ error: 'Média non trouvé' });
     }
-    res.status(200).json(media);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Erreur lors de la récupération du média' });
+    res.status(500).json({ error: 'Erreur lors de la récupération du média' });
   }
 };
 
-// Supprimer un média
-const deleteMedia = async (req, res) => {
+exports.createMedia = async (req, res) => {
+  try {
+    const { id_oeuvre, type_media, url, description } = req.body;
+    const newMedia = await Media.create({
+      id_oeuvre,
+      type_media,
+      url,
+      description
+    });
+    res.status(201).json(newMedia);
+  } catch (error) {
+    res.status(400).json({ error: 'Erreur lors de la création du média' });
+  }
+};
+
+exports.updateMedia = async (req, res) => {
+  try {
+    const { id_oeuvre, type_media, url, description } = req.body;
+    const media = await Media.findByPk(req.params.id);
+    if (media) {
+      await media.update({ id_oeuvre, type_media, url, description });
+      res.status(200).json(media);
+    } else {
+      res.status(404).json({ error: 'Média non trouvé' });
+    }
+  } catch (error) {
+    res.status(400).json({ error: 'Erreur lors de la mise à jour du média' });
+  }
+};
+
+exports.deleteMedia = async (req, res) => {
   try {
     const media = await Media.findByPk(req.params.id);
-    if (!media) return res.status(404).json({ error: 'Média non trouvé.' });
-
-    await media.destroy();
-    res.status(204).json({ message: 'Média supprimé avec succès' });
+    if (media) {
+      await media.destroy();
+      res.status(204).json();
+    } else {
+      res.status(404).json({ error: 'Média non trouvé' });
+    }
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Erreur lors de la suppression du média' });
   }
-};
-
-// Mettre à jour un média
-const updateMedia = async (req, res) => {
-  try {
-    const media = await Media.findByPk(req.params.id);
-    if (!media) return res.status(404).json({ error: 'Média non trouvé.' });
-
-    await media.update(req.body);
-    res.status(200).json({ message: 'Média mis à jour avec succès', media });
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
-
-module.exports = {
-  createMedia,
-  getAllMedia,
-  getMediaById,
-  deleteMedia,
-  updateMedia,
 };

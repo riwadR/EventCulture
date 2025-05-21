@@ -29,4 +29,4 @@ Organisation.associate = models => {
   });
 };
 
-Organisation; }
+return Organisation; }

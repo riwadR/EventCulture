@@ -1,9 +1,7 @@
 
 module.exports = (sequelize, DataTypes) => {
-
 // Import the User model correctly
 const User = require("./User");
-
 const Commentaire = sequelize.define(
   "Commentaire",
   {

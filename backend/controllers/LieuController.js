@@ -1,73 +1,70 @@
-const Lieu = require('../models/Lieu');
+const { Lieu } = require('../models');
 
-// Créer un nouveau lieu
-const createLieu = async (req, res) => {
+exports.getAllLieux = async (req, res) => {
   try {
-    const { nom, adresse, ville, pays } = req.body;
-    const newLieu = await Lieu.create({ nom, adresse, ville, pays });
-    res.status(201).json({ message: 'Lieu créé avec succès', lieu: newLieu });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Erreur lors de la création du lieu' });
-  }
-};
-
-// Obtenir tous les lieux
-const getAllLieux = async (req, res) => {
-  try {
-    const lieux = await Lieu.findAll();
+    const lieux = await Lieu.findAll({
+      include: [{ model: Lieu.associations.Commune }]
+    });
     res.status(200).json(lieux);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Erreur lors de la récupération des lieux' });
+    res.status(500).json({ error: 'Erreur lors de la récupération des lieux' });
   }
 };
 
-// Obtenir un lieu par son ID
-const getLieuById = async (req, res) => {
-  const { id } = req.params;
+exports.getLieuById = async (req, res) => {
   try {
-    const lieu = await Lieu.findByPk(id);
-    if (!lieu) {
-      return res.status(404).json({ message: 'Lieu non trouvé' });
+    const lieu = await Lieu.findByPk(req.params.id, {
+      include: [{ model: Lieu.associations.Commune }]
+    });
+    if (lieu) {
+      res.status(200).json(lieu);
+    } else {
+      res.status(404).json({ error: 'Lieu non trouvé' });
     }
-    res.status(200).json(lieu);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Erreur lors de la récupération du lieu' });
+    res.status(500).json({ error: 'Erreur lors de la récupération du lieu' });
   }
 };
 
-// Supprimer un lieu
-const deleteLieu = async (req, res) => {
+exports.createLieu = async (req, res) => {
+  try {
+    const { nom, adresse, commune_id } = req.body;
+    const newLieu = await Lieu.create({
+      nom,
+      adresse,
+      commune_id
+    });
+    res.status(201).json(newLieu);
+  } catch (error) {
+    res.status(400).json({ error: 'Erreur lors de la création du lieu' });
+  }
+};
+
+exports.updateLieu = async (req, res) => {
+  try {
+    const { nom, adresse, commune_id } = req.body;
+    const lieu = await Lieu.findByPk(req.params.id);
+    if (lieu) {
+      await lieu.update({ nom, adresse, commune_id });
+      res.status(200).json(lieu);
+    } else {
+      res.status(404).json({ error: 'Lieu non trouvé' });
+    }
+  } catch (error) {
+    res.status(400).json({ error: 'Erreur lors de la mise à jour du lieu' });
+  }
+};
+
+exports.deleteLieu = async (req, res) => {
   try {
     const lieu = await Lieu.findByPk(req.params.id);
-    if (!lieu) return res.status(404).json({ error: 'Lieu non trouvé.' });
-
-    await lieu.destroy();
-    res.status(204).json({ message: 'Lieu supprimé avec succès' });
+    if (lieu) {
+      await lieu.destroy();
+      res.status(204).json();
+    } else {
+      res.status(404).json({ error: 'Lieu non trouvé' });
+    }
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Erreur lors de la suppression du lieu' });
   }
-};
-
-// Mettre à jour un lieu
-const updateLieu = async (req, res) => {
-  try {
-    const lieu = await Lieu.findByPk(req.params.id);
-    if (!lieu) return res.status(404).json({ error: 'Lieu non trouvé.' });
-
-    await lieu.update(req.body);
-    res.status(200).json({ message: 'Lieu mis à jour avec succès', lieu });
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
-
-module.exports = {
-  createLieu,
-  getAllLieux,
-  getLieuById,
-  deleteLieu,
-  updateLieu
 };

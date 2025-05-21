@@ -1,9 +1,9 @@
-const { TypeEvenement } = require('../models');
+const { TypeEvenement, Evenement } = require('../models');
 
 exports.getAllTypeEvenements = async (req, res) => {
   try {
     const typeEvenements = await TypeEvenement.findAll({
-      include: [{ model: TypeEvenement.associations.Evenement }]
+      include: [{ model: Evenement }]
     });
     res.status(200).json(typeEvenements);
   } catch (error) {
@@ -14,12 +14,12 @@ exports.getAllTypeEvenements = async (req, res) => {
 exports.getTypeEvenementById = async (req, res) => {
   try {
     const typeEvenement = await TypeEvenement.findByPk(req.params.id, {
-      include: [{ model: TypeEvenement.associations.Evenement }]
+      include: [{ model: Evenement }]
     });
     if (typeEvenement) {
       res.status(200).json(typeEvenement);
     } else {
-      res.status(404).json({ error: Ascending: 'Type d\'événement non trouvé' });
+      res.status(404).json({ error: 'Type d\'événement non trouvé' });
     }
   } catch (error) {
     res.status(500).json({ error: 'Erreur lors de la récupération du type d\'événement' });
@@ -59,7 +59,7 @@ exports.deleteTypeEvenement = async (req, res) => {
     const typeEvenement = await TypeEvenement.findByPk(req.params.id);
     if (typeEvenement) {
       await typeEvenement.destroy();
-      res.status(204).json();
+      res.status(204).send();
     } else {
       res.status(404).json({ error: 'Type d\'événement non trouvé' });
     }
