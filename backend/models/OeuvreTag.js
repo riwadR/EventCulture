@@ -1,9 +1,14 @@
 // models/OeuvreTag.js
 module.exports = (sequelize, DataTypes) => {
 const OeuvreTag = sequelize.define('OeuvreTag', {
+  id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+      },
   id_oeuvre: {
     type: DataTypes.INTEGER,
-    primaryKey: true,
+  
     references: {
       model: 'Oeuvre',
       key: 'id_oeuvre'
@@ -11,13 +16,23 @@ const OeuvreTag = sequelize.define('OeuvreTag', {
   },
   id_tag: {
     type: DataTypes.INTEGER,
-    primaryKey: true,
+  
     references: {
       model: 'TagMotCle',
       key: 'id_tag'
     }
   }
-}, {
+},
+{
+  indexes: [
+    {
+      unique: true,
+      fields: ['id_tag', 'id_oeuvre']
+    }
+  ]
+},
+
+{
   tableName: 'Oeuvre_Tag',
   timestamps: false
 });

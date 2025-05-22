@@ -2,9 +2,14 @@ module.exports = (sequelize, DataTypes) => {
 const UserRole = sequelize.define(
   "UserRole",
   {
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+      },
     id_user: {
       type: DataTypes.INTEGER,
-      primaryKey: true,
+      
       allowNull: false,
       references: {
         model: "User",
@@ -14,7 +19,7 @@ const UserRole = sequelize.define(
     },
     id_role: {
       type: DataTypes.INTEGER,
-      primaryKey: true,
+     
       allowNull: false,
       references: {
         model: "Role",
@@ -23,6 +28,15 @@ const UserRole = sequelize.define(
       onDelete: "CASCADE",
     },
   },
+
+  {
+  indexes: [
+    {
+      unique: true,
+      fields: ['id_user', 'id_role']
+    }
+  ]
+},
   {
     tableName: "User_Role",
     timestamps: false,

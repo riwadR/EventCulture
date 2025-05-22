@@ -21,12 +21,11 @@ const Organisation = sequelize.define('Organisation', {
   timestamps: false
 });
 
-Organisation.associate = models => {
-  Organisation.belongsToMany(models.Evenement, {
-    through: models.EvenementOrganisation,
-    foreignKey: 'id_organisation',
-    as: 'Evenements'
-  });
-};
+ Organisation.associate = (models) => {
+    Organisation.hasMany(models.EvenementOrganisation, {
+      foreignKey: 'id_organisation',
+      as: 'evenements',
+    });
+  };
 
 return Organisation; }

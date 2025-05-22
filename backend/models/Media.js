@@ -1,5 +1,4 @@
 // models/Media.js
-
 module.exports = (sequelize, DataTypes) => {
 
 const Media = sequelize.define('Media', {

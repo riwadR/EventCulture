@@ -3,9 +3,13 @@ module.exports = (sequelize, DataTypes) => {
 const EvenementOeuvre = sequelize.define(
   "EvenementOeuvre",
   {
+    id_EventOeuvre: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true,
+          },
     id_evenement: {
       type: DataTypes.INTEGER,
-      primaryKey: true,
       allowNull: false,
       references: {
         model: "Evenement",
@@ -15,7 +19,6 @@ const EvenementOeuvre = sequelize.define(
     },
     id_oeuvre: {
       type: DataTypes.INTEGER,
-      primaryKey: true,
       allowNull: false,
       references: {
         model: "Oeuvre",

@@ -3,9 +3,15 @@
 module.exports = (sequelize, DataTypes) => {
 
 const OeuvreCollection = sequelize.define('OeuvreCollection', {
+  
+  id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+      },
   id_oeuvre: {
     type: DataTypes.INTEGER,
-    primaryKey: true,
+  
     references: {
       model: 'Oeuvre',
       key: 'id_oeuvre'
@@ -15,7 +21,7 @@ const OeuvreCollection = sequelize.define('OeuvreCollection', {
   },
   id_collection: {
     type: DataTypes.INTEGER,
-    primaryKey: true,
+   
     references: {
       model: 'Collection',
       key: 'id_collection'
@@ -23,7 +29,17 @@ const OeuvreCollection = sequelize.define('OeuvreCollection', {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
   }
-}, {
+},
+{
+  indexes: [
+    {
+      unique: true,
+      fields: ['id_oeuvre', 'id_collection']
+    }
+  ]
+},
+
+{
   tableName: 'OeuvreCollection',
   timestamps: false
 });

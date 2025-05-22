@@ -1,5 +1,4 @@
 // C:\Users\Dell\Documents\EventCulture\backend\models\Role.js
-
 module.exports = (sequelize, DataTypes) => {
 const Role = sequelize.define(
   "Role",

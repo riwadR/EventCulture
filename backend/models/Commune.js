@@ -1,18 +1,21 @@
-const { DataTypes } = require('sequelize');
-
-module.exports = (sequelize) => {
+module.exports = (sequelize, DataTypes) => {
   const Commune = sequelize.define('Commune', {
-    id: {
-      type: DataTypes.STRING,
+    id_commune: {
+      type: DataTypes.INTEGER,
       primaryKey: true,
+      autoIncrement: true,
       allowNull: false,
     },
     nom: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    dairaId: {
+    commune_name_ascii: {
       type: DataTypes.STRING,
+      allowNull: false,
+    },
+    dairaId: {
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
   }, {

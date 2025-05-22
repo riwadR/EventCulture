@@ -1,11 +1,16 @@
 // models/OeuvreCategorie.js
-const { DataTypes } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
 
 const OeuvreCategorie = sequelize.define('OeuvreCategorie', {
+  id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+      },
+  
   id_oeuvre: {
     type: DataTypes.INTEGER,
-    primaryKey: true,
+    
     references: {
       model: 'Oeuvre',
       key: 'id_oeuvre'
@@ -15,7 +20,7 @@ const OeuvreCategorie = sequelize.define('OeuvreCategorie', {
   },
   id_categorie: {
     type: DataTypes.INTEGER,
-    primaryKey: true,
+   
     references: {
       model: 'Categorie',
       key: 'id_categorie'
@@ -23,7 +28,16 @@ const OeuvreCategorie = sequelize.define('OeuvreCategorie', {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
   }
-}, {
+}, 
+{
+  indexes: [
+    {
+      unique: true,
+      fields: ['id_oeuvre', 'id_categorie']
+    }
+  ]
+},
+{
   tableName: 'OeuvreCategorie',
   timestamps: false
 });

@@ -1,4 +1,3 @@
-// C:\Users\Dell\Documents\EventCulture\backend\models\Evenement.js
 module.exports = (sequelize, DataTypes) => {
   const Evenement = sequelize.define(
     "Evenement",
@@ -22,19 +21,19 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.DATE,
       },
       contact_email: {
-    type: DataTypes.STRING(255)
-  },
-  contact_telephone: {
-    type: DataTypes.STRING(20)
-  },
-  image_url: {
-    type: DataTypes.STRING(255)
-  },
+        type: DataTypes.STRING(255),
+      },
+      contact_telephone: {
+        type: DataTypes.STRING(20),
+      },
+      image_url: {
+        type: DataTypes.STRING(255),
+      },
       id_lieu: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.INTEGER,   // INTEGER et FK vers Lieu.id_lieu
         allowNull: false,
         references: {
-          model: "lieu", // Changed to lowercase to match Lieu.js tableName
+          model: "lieux",  // Nom de la table Lieu (pluriel)
           key: "id_lieu",
         },
         onDelete: "RESTRICT",
@@ -43,7 +42,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: "user", // Changed to lowercase to match Lieu.js tableName
+          model: "user",
           key: "id_user",
         },
         onDelete: "RESTRICT",
@@ -92,6 +91,10 @@ module.exports = (sequelize, DataTypes) => {
         as: "OeuvresPresentation",
       });
     }
+     Evenement.hasMany(models.EvenementOrganisation, {
+      foreignKey: 'id_evenement',
+      as: 'organisations',
+    });
     if (models.EvenementUser) {
       Evenement.hasMany(models.EvenementUser, { foreignKey: "id_evenement" });
     }

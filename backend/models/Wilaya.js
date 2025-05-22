@@ -1,13 +1,20 @@
-const { DataTypes } = require('sequelize');
-
-module.exports = (sequelize) => {
+module.exports = (sequelize, DataTypes) => {
   const Wilaya = sequelize.define('Wilaya', {
-    id: {
-      type: DataTypes.STRING,
+    id_wilaya: {
+      type: DataTypes.INTEGER,
       primaryKey: true,
+      autoIncrement: true,
       allowNull: false,
     },
+    codeW: {
+      type: DataTypes.INTEGER,
+      unique: true,
+    },
     nom: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    wilaya_name_ascii: {
       type: DataTypes.STRING,
       allowNull: false,
     },

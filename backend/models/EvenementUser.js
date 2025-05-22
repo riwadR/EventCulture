@@ -2,9 +2,14 @@
 module.exports = (sequelize, DataTypes) => {
 
 const EvenementUser = sequelize.define('EvenementUser', {
+  id_EventUser: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+      },
   id_evenement: {
     type: DataTypes.INTEGER,
-    primaryKey: true,
+   
     references: {
       model: 'Evenement',
       key: 'id_evenement'
@@ -12,7 +17,7 @@ const EvenementUser = sequelize.define('EvenementUser', {
   },
   id_user: {
     type: DataTypes.INTEGER,
-    primaryKey: true,
+  
     references: {
       model: 'User',
       key: 'id_user'
@@ -34,7 +39,17 @@ const EvenementUser = sequelize.define('EvenementUser', {
     type: DataTypes.TEXT,
     allowNull: true
   }
-}, {
+}, 
+{
+  indexes: [
+    {
+      unique: true,
+      fields: ['id_user', 'id_evenement']
+    }
+  ]
+},
+
+{
   tableName: 'EvenementUser',
   timestamps: false
 });

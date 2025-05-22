@@ -1,4 +1,3 @@
-
 module.exports = (sequelize, DataTypes) => {
 const User = sequelize.define(
   "User",
@@ -33,6 +32,18 @@ const User = sequelize.define(
     },
     nationalite: {
       type: DataTypes.STRING(50),
+    },
+     email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true, // 🔒 Rend l'email unique
+      validate: {
+        isEmail: true, // ✅ Validation de format
+      },
+    },
+     password: {
+      type: DataTypes.STRING(250),
+      allowNull: false,
     },
     biographie: {
       type: DataTypes.TEXT,
