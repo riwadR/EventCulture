@@ -21,6 +21,15 @@ const Oeuvre = sequelize.define(
       },
       onDelete: "RESTRICT",
     },
+     id_langue: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: "Langue",
+        key: "id_langue",
+      },
+      onDelete: "RESTRICT",
+    },
     annee_creation: {
       type: DataTypes.INTEGER,
     },
@@ -40,6 +49,7 @@ const Oeuvre = sequelize.define(
 
 Oeuvre.associate = (models) => {
   Oeuvre.belongsTo(models.TypeOeuvre, { foreignKey: "id_type_oeuvre" });
+    Oeuvre.belongsTo(models.Langue, { foreignKey: "id_langue" });
   Oeuvre.hasOne(models.Livre, { foreignKey: "id_oeuvre" });
   Oeuvre.hasOne(models.Film, { foreignKey: "id_oeuvre" });
   Oeuvre.hasOne(models.AlbumMusical, { foreignKey: "id_oeuvre" });

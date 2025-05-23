@@ -26,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
   Daira.associate = (models) => {
     Daira.belongsTo(models.Wilaya, { foreignKey: 'wilayaId' });
     Daira.hasMany(models.Commune, { foreignKey: 'dairaId', onDelete: 'CASCADE' });
+   
   };
 
   return Daira;

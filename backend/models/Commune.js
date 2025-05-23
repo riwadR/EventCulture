@@ -24,7 +24,12 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   Commune.associate = (models) => {
-    Commune.belongsTo(models.Daira, { foreignKey: 'dairaId' });
+    Commune.belongsTo(models.Commune, { foreignKey: 'dairaId' });
+     Commune.hasMany(models.Localite, {
+      foreignKey: 'id_commune',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE'
+    });
   };
 
   return Commune;

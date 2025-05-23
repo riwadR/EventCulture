@@ -22,6 +22,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: true,
     },
+    localiteId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
     nom: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -63,6 +67,7 @@ module.exports = (sequelize, DataTypes) => {
 
   Lieu.associate = (models) => {
     Lieu.belongsTo(models.Wilaya, { foreignKey: 'wilayaId' });
+    Lieu.belongsTo(models.Localite, { foreignKey: 'localiteId' });
     Lieu.belongsTo(models.Daira, { foreignKey: 'dairaId' });
     Lieu.belongsTo(models.Commune, { foreignKey: 'communeId' });
     Lieu.hasOne(models.DetailLieu, { foreignKey: 'lieuId', onDelete: 'CASCADE' });

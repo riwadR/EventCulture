@@ -10,6 +10,15 @@ const Organisation = sequelize.define('Organisation', {
     type: DataTypes.STRING(255),
     allowNull: false
   },
+   id_type_organisation: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: "TypeOrganisation",
+        key: "id_type_organisation",
+      },
+      onDelete: "RESTRICT",
+    },
   description: {
     type: DataTypes.TEXT
   },
@@ -25,6 +34,10 @@ const Organisation = sequelize.define('Organisation', {
     Organisation.hasMany(models.EvenementOrganisation, {
       foreignKey: 'id_organisation',
       as: 'evenements',
+    });
+    Organisation.belongsTo(models.TypeOrganisation, {
+      foreignKey: 'id_type_organisation',
+      as: 'typeOrganisation',
     });
   };
 
