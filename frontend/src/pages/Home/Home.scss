@@ -48,8 +48,6 @@
     font-weight: 600;
 }
 
-.featured-events__grid {
-}
 
 .event-card {
     height: 100%;
@@ -181,7 +179,31 @@
         color: #333;
     }
 }
-
+@media (max-width: 1024px) {
+    .presentation {
+      flex-direction: column;
+      align-items: center;
+      padding: 3rem 2rem;
+      text-align: center;
+  
+      .presentation__img {
+        width: 100%;
+        min-width: unset;
+        height: auto;
+        aspect-ratio: 4 / 3;
+      }
+  
+      .presentation__title,
+      .presentation__subheading,
+      .presentation__body-text,
+      .presentation__detailed-text {
+        text-align: center;
+      }
+    }
+  }
+  
+  
+  
 @media (max-width: 768px) {
     .hero__title {
         font-size: 2rem;
@@ -194,4 +216,27 @@
     .featured-events__grid {
         grid-template-columns: 1fr;
     }
+    .presentation {
+        padding: 2rem 1rem;
+        gap: 2rem;
+    
+        .presentation__title {
+          font-size: 1.25rem;
+        }
+    
+        .presentation__subheading {
+          font-size: 1.1rem;
+        }
+    
+        .presentation__body-text,
+        .presentation__detailed-text {
+          font-size: 0.95rem;
+        }
+    
+        .presentation__img {
+          aspect-ratio: 16 / 9;
+          height: auto;
+          width: 100%;
+        }
+      }
 }

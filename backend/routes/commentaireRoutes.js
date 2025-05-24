@@ -1,5 +1,5 @@
 const express = require('express');
-const commentaireController = require('../controllers/CommentaireController');
+const commentaireController = require('../controllers/commentaireController');
 const router = express.Router();
 
 router.get('/:id', commentaireController.getCommentaireById); // Récupérer un commentaire par son ID

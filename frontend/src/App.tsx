@@ -8,6 +8,7 @@ import Navbar from './components/layout/Navbar/Navbar';
 import Footer from './components/layout/Footer';
 import { ROUTES } from './config/routes';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import AdminRoute from './components/auth/AdminRoute';
 
 // Pages
 import HomePage from './pages/Home';
@@ -16,16 +17,20 @@ import ContactPage from './pages/Footer/Contact/Contact';
 import Legal from './pages/Footer/Legal/Legal';
 import Login from './pages/User/login/Login';
 import Register from './pages/User/register/Register';
+import EventList from './pages/Event/List/EventList';
+import Event from './pages/Event/Event';
 // import ProfilePage from './pages/Profile';
 import NotFoundPage from './pages/NotFound';
 
 // Styles globaux
 import './index.scss';
 import CatalogueList from './pages/Catalogue/List/CatalogueList';
-import EventList from './pages/Event/List/EventList';
 
 // Formulaire(s) d'ajout de données
 import LieuForm from './pages/Lieu/New-Update/LieuForm';
+
+// ADMIN
+import AdminPage from './pages/Admin/Admin';
 
 const App: React.FC = () => {
   return (
@@ -45,7 +50,7 @@ const App: React.FC = () => {
                   <Route path={ROUTES.ABOUT} element={<AboutPage />} />
                   <Route path={ROUTES.CONTACT} element={<ContactPage />} />
                   <Route path={ROUTES.LEGAL} element={<Legal />} />
-                  {/* <Route path={ROUTES.EVENT_DETAILS} element={<EventDetailsPage />} /> */}
+                  <Route path={ROUTES.EVENT_DETAILS} element={<Event />} />
                   <Route path={ROUTES.LOGIN} element={<Login />} />
                   <Route path={ROUTES.REGISTER} element={<Register />} />
                   <Route path={ROUTES.LIEUX} element={<LieuForm />} />
@@ -55,6 +60,12 @@ const App: React.FC = () => {
                       <CatalogueList />
                     </ProtectedRoute>
                   } />
+                  <Route path={ROUTES.ADMIN} element={
+                    <AdminRoute>
+                      <AdminPage />
+                    </AdminRoute>
+                  } />
+                  {/* Routes protégées */}
                   <Route path="*" element={<NotFoundPage />} />
                 </Routes>
               </main>

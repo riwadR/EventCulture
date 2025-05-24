@@ -9,7 +9,8 @@ export const ROUTES = {
   REGISTER: '/register',
   PROFILE: '/profile',
   CATALOGUES: '/catalogues',
-  LIEUX: '/lieux'
+  LIEUX: '/lieux',
+  ADMIN: '/admin',
 } as const;
 
 export type RouteKey = keyof typeof ROUTES;
@@ -31,3 +32,7 @@ export const PRIVATE_ROUTES: RoutePath[] = [
   ROUTES.PROFILE,
   ROUTES.CATALOGUES,
 ]; 
+
+export const ADMIN_ROUTES: RoutePath[] = [
+  ROUTES.ADMIN,
+];

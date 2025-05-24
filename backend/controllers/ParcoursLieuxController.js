@@ -1,74 +1,84 @@
-// controllers/ParcoursLieuxController.js
-const ParcoursLieux = require('../models/Parcours_Lieux');
+const { ParcoursLieux } = require('../models');
 
-// Créer un nouveau parcours-lieu
-const createParcoursLieux = async (req, res) => {
+exports.getAllParcoursLieux = async (req, res) => {
+  try {
+    const parcoursLieux = await ParcoursLieux.findAll({
+      include: [
+        { model: ParcoursLieux.associations.Parcours },
+        { model: ParcoursLieux.associations.Lieu },
+        { model: ParcoursLieux.associations.Evenement }
+      ]
+    });
+    res.status(200).json(parcoursLieux);
+  } catch (error) {
+    res.status(500).json({ error: 'Erreur lors de la récupération des parcours-lieux' });
+  }
+};
+
+exports.getParcoursLieuById = async (req, res) => {
+  try {
+    const parcoursLieu = await ParcoursLieux.findByPk(req.params.id, {
+      include: [
+        { model: ParcoursLieux.associations.Parcours },
+        { model: ParcoursLieux.associations.Lieu },
+        { model: ParcoursLieux.associations.Evenement }
+      ]
+    });
+    if (parcoursLieu) {
+      res.status(200).json(parcoursLieu);
+    } else {
+      res.status(404).json({ error: 'Parcours-lieu non trouvé' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Erreur lors de la récupération du parcours-lieu' });
+  }
+};
+
+exports.createParcoursLieu = async (req, res) => {
   try {
     const { id_parcours, id_lieu, id_evenement, ordre } = req.body;
-    const newParcoursLieux = await ParcoursLieux.create({ id_parcours, id_lieu, id_evenement, ordre });
-    res.status(201).json({ message: 'Parcours-Lieu créé avec succès', parcoursLieux: newParcoursLieux });
+    const newParcoursLieu = await ParcoursLieux.create({
+      id_parcours,
+      id_lieu,
+      id_evenement,
+      ordre
+    });
+    res.status(201).json(newParcoursLieu);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Erreur lors de la création du parcours-lieu' });
+    res.status(400).json({ error: 'Erreur lors de la création du parcours-lieu' });
   }
 };
 
-// Obtenir tous les parcours-lieux
-const getAllParcoursLieux = async (req, res) => {
+exports.updateParcoursLieu = async (req, res) => {
   try {
-    const parcoursLieux = await ParcoursLieux.findAll();
-    res.status(200).json(parcoursLieux);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Erreur lors de la récupération des parcours-lieux' });
-  }
-};
-
-// Obtenir un parcours-lieu par son ID
-const getParcoursLieuxById = async (req, res) => {
-  const { id } = req.params;
-  try {
-    const parcoursLieux = await ParcoursLieux.findByPk(id);
-    if (!parcoursLieux) {
-      return res.status(404).json({ message: 'Parcours-Lieu non trouvé' });
+    const { id_parcours, id_lieu, id_evenement, ordre } = req.body;
+    const parcoursLieu = await ParcoursLieux.findByPk(req.params.id);
+    if (parcoursLieu) {
+      await parcoursLieu.update({
+        id_parcours,
+        id_lieu,
+        id_evenement,
+        ordre
+      });
+      res.status(200).json(parcoursLieu);
+    } else {
+      res.status(404).json({ error: 'Parcours-lieu non trouvé' });
     }
-    res.status(200).json(parcoursLieux);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Erreur lors de la récupération du parcours-lieu' });
+    res.status(400).json({ error: 'Erreur lors de la mise à jour du parcours-lieu' });
   }
 };
 
-// Supprimer un parcours-lieu
-const deleteParcoursLieux = async (req, res) => {
+exports.deleteParcoursLieu = async (req, res) => {
   try {
-    const parcoursLieux = await ParcoursLieux.findByPk(req.params.id);
-    if (!parcoursLieux) return res.status(404).json({ error: 'Parcours-Lieu non trouvé.' });
-
-    await parcoursLieux.destroy();
-    res.status(204).json({ message: 'Parcours-Lieu supprimé avec succès' });
+    const parcoursLieu = await ParcoursLieux.findByPk(req.params.id);
+    if (parcoursLieu) {
+      await parcoursLieu.destroy();
+      res.status(204).json();
+    } else {
+      res.status(404).json({ error: 'Parcours-lieu non trouvé' });
+    }
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Erreur lors de la suppression du parcours-lieu' });
   }
-};
-
-// Mettre à jour un parcours-lieu
-const updateParcoursLieux = async (req, res) => {
-  try {
-    const parcoursLieux = await ParcoursLieux.findByPk(req.params.id);
-    if (!parcoursLieux) return res.status(404).json({ error: 'Parcours-Lieu non trouvé.' });
-
-    await parcoursLieux.update(req.body);
-    res.status(200).json({ message: 'Parcours-Lieu mis à jour avec succès', parcoursLieux });
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
-
-module.exports = {
-  createParcoursLieux,
-  getAllParcoursLieux,
-  getParcoursLieuxById,
-  deleteParcoursLieux,
-  updateParcoursLieux,
 };

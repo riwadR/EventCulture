@@ -1,7 +1,5 @@
 // models/Parcours.js
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
-
+module.exports = (sequelize, DataTypes) => {
 const Parcours = sequelize.define("Parcours", {
   id_parcours: {
     type: DataTypes.INTEGER,
@@ -22,4 +20,4 @@ const Parcours = sequelize.define("Parcours", {
   },
 });
 
-module.exports = Parcours;
+return Parcours; }

@@ -1,38 +1,44 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
-const Event = require('./Event');
-
-const Programme = sequelize.define('Programme', {
+module.exports = (sequelize, DataTypes) => {
+const Programme = sequelize.define(
+  "Programme",
+  {
     id_programme: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
     },
     titre: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        validate: {
-            notEmpty: true
-        }
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+      },
     },
     description: {
-        type: DataTypes.TEXT,
-        allowNull: true
+      type: DataTypes.TEXT,
+      allowNull: true,
     },
     date_heure: {
-        type: DataTypes.DATE,
-        allowNull: false
+      type: DataTypes.DATE,
+      allowNull: false,
     },
-    id_event: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-          model: Event,
-          key: 'id_event'
-        },
-        onDelete: 'CASCADE',  // Si un événement est supprimé, les programmes associés seront supprimés
-        onUpdate: 'CASCADE'   // Si un événement est mis à jour, les programmes associés seront mis à jour
-    }
-});
+    id_evenement: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+  },
+  {
+    tableName: "Programme",
+    timestamps: false,
+  }
+);
 
-module.exports = Programme;
+Programme.associate = (models) => {
+  Programme.belongsTo(models.Evenement, {
+    foreignKey: "id_evenement",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+  });
+};
+
+return Programme; }

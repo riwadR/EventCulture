@@ -1,50 +1,67 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
-const User = require('./User');
+module.exports = (sequelize, DataTypes) => {
 
-const Oeuvre = sequelize.define('Oeuvre', {
+const Oeuvre = sequelize.define(
+  "Oeuvre",
+  {
     id_oeuvre: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
     },
     titre: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        validate: {
-            notEmpty: true
-        }
+      type: DataTypes.STRING(255),
+      allowNull: false,
     },
-    type: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        validate: {
-            notEmpty: true
-        }
+    id_type_oeuvre: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: "Type_Oeuvre",
+        key: "id_type_oeuvre",
+      },
+      onDelete: "RESTRICT",
+    },
+     id_langue: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: "Langue",
+        key: "id_langue",
+      },
+      onDelete: "RESTRICT",
+    },
+    annee_creation: {
+      type: DataTypes.INTEGER,
     },
     description: {
-        type: DataTypes.STRING,
-        allowNull: true
+      type: DataTypes.TEXT,
     },
-    prix: {
-        type: DataTypes.FLOAT,
-        allowNull: false
+    image_url: {
+      type: DataTypes.STRING(255),
     },
-    image: {
-        type: DataTypes.STRING, // Stocke l'URL de l'image
-        allowNull: false, // On autorise pas une Oeuvre sans image.
-        validate: {
-            isUrl: true, // Vérifie que la valeur est une URL valide
-        }
-    },
-    id_createur: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-        references: {
-            model: User,
-            key: 'id_user'
-        }
-    } 
-});
+  },
+  {
+    tableName: "Oeuvre",
+    createdAt: "date_creation",
+    updatedAt: "date_modification",
+  }
+);
 
-module.exports = Oeuvre;
+Oeuvre.associate = (models) => {
+  Oeuvre.belongsTo(models.TypeOeuvre, { foreignKey: "id_type_oeuvre" });
+    Oeuvre.belongsTo(models.Langue, { foreignKey: "id_langue" });
+  Oeuvre.hasOne(models.Livre, { foreignKey: "id_oeuvre" });
+  Oeuvre.hasOne(models.Film, { foreignKey: "id_oeuvre" });
+  Oeuvre.hasOne(models.AlbumMusical, { foreignKey: "id_oeuvre" });
+  Oeuvre.hasOne(models.OeuvreArt, { foreignKey: "id_oeuvre" });
+  Oeuvre.hasOne(models.Artisanat, { foreignKey: "id_oeuvre" });
+  Oeuvre.hasMany(models.Media, { foreignKey: "id_oeuvre" });
+  Oeuvre.hasMany(models.CritiqueEvaluation, { foreignKey: "id_oeuvre" });
+  Oeuvre.belongsToMany(models.Evenement, {
+    through: models.EvenementOeuvre,
+    foreignKey: "id_oeuvre",
+    as: "EvenementsPresentation",
+  });
+};
+
+return Oeuvre; }

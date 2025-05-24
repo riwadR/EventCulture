@@ -1,44 +1,36 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
+
+module.exports = (sequelize, DataTypes) => {
+// Import the User model correctly
 const User = require("./User");
-const Event = require("./Event");
-
-const Commentaire = sequelize.define("Commentaire", {
-  id_comment: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
-    allowNull: false,
-  },
-  id_user: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: User, // Référence la table User
-      key: "id_user",
+const Commentaire = sequelize.define(
+  "Commentaire",
+  {
+    id_commentaire: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
     },
-    onUpdate: "CASCADE",
-    onDelete: "CASCADE",
-  },
-  id_event: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: Event, // Référence la table Event
-      key: "id_event",
+    contenu: {
+      type: DataTypes.TEXT,
+      allowNull: false,
     },
-    onUpdate: "CASCADE",
-    onDelete: "CASCADE",
+    date_creation: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
+    // Add other fields as needed
   },
-  commentaire: {
-    type: DataTypes.TEXT,
-    allowNull: false,
-  },
-  date_commentaire: {
-    type: DataTypes.DATE,
-    allowNull: false,
-    defaultValue: DataTypes.NOW, // Date du commentaire
-  },
-});
+  {
+    tableName: "Commentaire",
+    createdAt: "date_creation",
+    updatedAt: "date_modification",
+  }
+);
 
-module.exports = Commentaire;
+// Define associations
+Commentaire.associate = (models) => {
+  Commentaire.belongsTo(models.User, { foreignKey: "id_user" });
+  // Add other associations as needed
+};
+
+return Commentaire; }
