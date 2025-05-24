@@ -95,6 +95,9 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'id_evenement',
       as: 'organisations',
     });
+    Evenement.associate = (models) => {
+  Evenement.hasMany(models.Media, { foreignKey: 'id_evenement' });
+};
     if (models.EvenementUser) {
       Evenement.hasMany(models.EvenementUser, { foreignKey: "id_evenement" });
     }

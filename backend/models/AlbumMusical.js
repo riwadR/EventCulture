@@ -10,8 +10,9 @@ const AlbumMusical = sequelize.define('AlbumMusical', {
     type: DataTypes.INTEGER,
     allowNull: false
   },
-  genre: {
-    type: DataTypes.STRING(100)
+  id_genre: {
+    type: DataTypes.INTEGER,
+    allowNull: false
   },
   duree: {
     type: DataTypes.INTEGER // durée en minutes
@@ -23,6 +24,7 @@ const AlbumMusical = sequelize.define('AlbumMusical', {
 
 AlbumMusical.associate = function(models) {
   AlbumMusical.belongsTo(models.Oeuvre, { foreignKey: 'id_oeuvre' });
+   AlbumMusical.belongsTo(models.Genre, { foreignKey: 'id_genre' });
 };
 
 return AlbumMusical;}

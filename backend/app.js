@@ -138,7 +138,7 @@ app.use((req, res) => {
 });
 const models = require("./models");
 // Synchronisation de la base de données
-sequelize.sync({ alter: false })
+sequelize.sync({ alter: true })
   .then(() => console.log("Base de données synchronisée."))
   .catch((err) => console.error("Erreur de synchronisation :", err));
 
