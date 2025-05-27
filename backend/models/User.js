@@ -30,9 +30,14 @@ const User = sequelize.define(
         isBefore: new Date().toISOString().split("T")[0],
       },
     },
-    nationalite: {
-      type: DataTypes.STRING(50),
-    },
+   telephone: {
+  type: DataTypes.STRING(20),
+  allowNull: true, // Optionnel
+  validate: {
+    is: /^[\+]?[0-9\s\-\(\)]{8,20}$/i, // Format flexible
+    len: [8, 20],
+  }
+},
      email: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -45,6 +50,24 @@ const User = sequelize.define(
       type: DataTypes.STRING(250),
       allowNull: false,
     },
+    // 🆕 Type d'utilisateur - leur profession/domaine
+      type_user: {
+        type: DataTypes.ENUM(
+          'ecrivain',
+          'acteur', 
+          'artiste',
+          'artisan',
+          'realisateur',
+          'musicien',
+          'photographe',
+          'danseur',
+          'sculpteur',
+          'visiteur'
+        ),
+        allowNull: false,
+        defaultValue: 'visiteur',
+        comment: 'Type professionnel de l\'utilisateur'
+      },
     biographie: {
       type: DataTypes.TEXT,
     },
