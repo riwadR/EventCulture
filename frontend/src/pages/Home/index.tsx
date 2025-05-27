@@ -6,6 +6,7 @@ import { ROUTES } from '../../config/routes';
 import { getAllEvents } from '../../services/eventService';
 import './Home.scss';
 import Event from '../../models/Event';
+import Carrousel from '../../components/Carrousel/Carrousel';
 
 const HomePage: React.FC = () => {
 
@@ -26,7 +27,10 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="home-page">
-      <section className="hero" style={{ background: `linear-gradient(rgba(211, 211, 211, 0.5), rgba(211, 211, 211, 0.5)), url('/images/home.png') no-repeat center center` }}>
+      <section className="hero">
+        <div className="hero__background">
+          <Carrousel />
+        </div>       
         <div className="hero__content">
           <h1 className="hero__title">Art & Âme d'AURES</h1>
         </div>
@@ -45,16 +49,18 @@ const HomePage: React.FC = () => {
           </p>
         </div>
       </section>
+
       <section className="featured-events">
         <div className="container">
           <h2 className="section-title">Événements à la une</h2>
           <div className="featured-events__grid">
             {events.slice(0, 3).map((event) => (
-              <Card
-                className="event-card"
-              >
+              <Card className="event-card" key={event.id_event}>
                 <div className="event-card__image">
-                  <img src="https://cdn.discordapp.com/attachments/1359154159940669591/1359154174142709930/image.png?ex=67fdb2b6&is=67fc6136&hm=12e7af497323e95d3478be5f2ea73a7e0b1df24d1f29a7f08c3df8a5e5761816&" alt={event.titre} />
+                  <img
+                    src="https://cdn.discordapp.com/attachments/1359154159940669591/1359154174142709930/image.png?ex=67fdb2b6&is=67fc6136&hm=12e7af497323e95d3478be5f2ea73a7e0b1df24d1f29a7f08c3df8a5e5761816&"
+                    alt={event.titre}
+                  />
                 </div>
                 <div className="event-card__details">
                   <p className='event-card_title'>{event.titre}</p>
@@ -93,4 +99,4 @@ const HomePage: React.FC = () => {
   );
 };
 
-export default HomePage; 
+export default HomePage;
