@@ -18,7 +18,8 @@ const Livre = sequelize.define('Livre', {
   nb_pages: {
     type: DataTypes.INTEGER,
     allowNull: true
-  }
+  },
+
 }, {
   tableName: 'Livre',
   timestamps: false
