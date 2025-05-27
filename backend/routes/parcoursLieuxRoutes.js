@@ -1,12 +1,11 @@
-// routes/parcoursLieuxRoutes.js
 const express = require('express');
-const parcoursLieuxController = require('../controllers/ParcoursLieuxController');
 const router = express.Router();
+const parcoursLieuxController = require('../controllers/parcoursLieuxController');
 
-router.get('/:id', parcoursLieuxController.getParcoursLieuxById); // Récupérer un parcours-lieu par son ID
-router.get('/', parcoursLieuxController.getAllParcoursLieux); // Récupérer la liste des parcours-lieux
-router.delete('/delete/:id', parcoursLieuxController.deleteParcoursLieux); // Supprimer un parcours-lieu
-router.put('/:id', parcoursLieuxController.updateParcoursLieux); // Mettre à jour un parcours-lieu
-router.post('/new', parcoursLieuxController.createParcoursLieux); // Créer un parcours-lieu
+router.get('/', parcoursLieuxController.getAllParcoursLieux);
+router.get('/:id', parcoursLieuxController.getParcoursLieuById);
+router.post('/', parcoursLieuxController.createParcoursLieu);
+router.put('/:id', parcoursLieuxController.updateParcoursLieu);
+router.delete('/:id', parcoursLieuxController.deleteParcoursLieu);
 
 module.exports = router;

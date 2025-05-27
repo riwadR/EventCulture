@@ -97,6 +97,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const value: AuthContextType = {
         user,
         isAuthenticated: !!user,
+        isAdmin: user?.role === 'admin',
         isLoading,
         error,
         login,
@@ -116,5 +117,14 @@ export const useAuth = (): AuthContextType => {
     }
     return context;
 };
+
+export const useIsAdmin = (): AuthContextType => {
+  const context = useContext(AuthContext);
+    if (context === undefined) {
+        throw new Error('useIsAdmin must be used within an AuthProvider');
+    }
+  return context;
+};
+
 
 export default AuthContext; 

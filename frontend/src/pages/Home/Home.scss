@@ -10,14 +10,48 @@
 
 /* Hero Section */
 .hero {
-    background-size: cover;
-    background-position: center;
-    height: 30rem;
-    color: var(--color-text-secondary);
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+
+  &__background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+
+    .carrousel {
+      width: 100%;
+      height: 100%;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        transition: opacity 1s ease-in-out;
+
+        &.active {
+          opacity: 1;
+          z-index: 2;
+        }
+      }
+    }
+  }
+
+  &__content {
+    position: relative;
+    z-index: 3;
+    color: white;
     text-align: center;
+    top: 50%;
+    transform: translateY(-50%);
+  }
 }
 
 .hero__title {
@@ -48,8 +82,6 @@
     font-weight: 600;
 }
 
-.featured-events__grid {
-}
 
 .event-card {
     height: 100%;
@@ -181,7 +213,31 @@
         color: #333;
     }
 }
-
+@media (max-width: 1024px) {
+    .presentation {
+      flex-direction: column;
+      align-items: center;
+      padding: 3rem 2rem;
+      text-align: center;
+  
+      .presentation__img {
+        width: 100%;
+        min-width: unset;
+        height: auto;
+        aspect-ratio: 4 / 3;
+      }
+  
+      .presentation__title,
+      .presentation__subheading,
+      .presentation__body-text,
+      .presentation__detailed-text {
+        text-align: center;
+      }
+    }
+  }
+  
+  
+  
 @media (max-width: 768px) {
     .hero__title {
         font-size: 2rem;
@@ -194,4 +250,27 @@
     .featured-events__grid {
         grid-template-columns: 1fr;
     }
+    .presentation {
+        padding: 2rem 1rem;
+        gap: 2rem;
+    
+        .presentation__title {
+          font-size: 1.25rem;
+        }
+    
+        .presentation__subheading {
+          font-size: 1.1rem;
+        }
+    
+        .presentation__body-text,
+        .presentation__detailed-text {
+          font-size: 0.95rem;
+        }
+    
+        .presentation__img {
+          aspect-ratio: 16 / 9;
+          height: auto;
+          width: 100%;
+        }
+      }
 }
