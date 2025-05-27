@@ -54,6 +54,8 @@ const User = sequelize.define(
       type_user: {
         type: DataTypes.ENUM(
           'ecrivain',
+          'journaliste',
+          'scientifique',
           'acteur', 
           'artiste',
           'artisan',

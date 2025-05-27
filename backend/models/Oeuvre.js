@@ -36,9 +36,7 @@ const Oeuvre = sequelize.define(
     description: {
       type: DataTypes.TEXT,
     },
-    image_url: {
-      type: DataTypes.STRING(255),
-    },
+   
   },
   {
     tableName: "Oeuvre",

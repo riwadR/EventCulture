@@ -23,10 +23,7 @@ const OeuvreUser = sequelize.define('OeuvreUser', {
       key: 'id_user'
     }
   },
-  role: {
-    type: DataTypes.STRING(100), // rôle de l'utilisateur dans l'oeuvre (ex: auteur, réalisateur...)
-    allowNull: false
-  }
+
 }, 
 {
   indexes: [
