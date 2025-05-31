@@ -2,8 +2,16 @@ node_modules/
 backend/.env
 frontend/.env
 backend/uploads
+backend/uploads/images/*
+backend/uploads/documents/*
+backend/uploads/media/*
+backend/!uploads/images/.gitkeep
+backend/!uploads/documents/.gitkeep
+backend/!uploads/media/.gitkeep
 # Ignorer les fichiers package-lock.json
 package-lock.json
 */package-lock.json
 
 backend/.DS_Store
+
+
