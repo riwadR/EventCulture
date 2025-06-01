@@ -1,427 +1,470 @@
-// utils/storage.ts
+// utils/storage.ts - Utilitaires pour le stockage local et session
 
-import { STORAGE_KEYS } from '../constants';
+// =============================================================================
+// TOKEN STORAGE (pour l'authentification)
+// =============================================================================
 
-// Interface pour les options de stockage
-interface StorageOptions {
-  expire?: number; // Durée en millisecondes
-  encrypt?: boolean; // Si on veut chiffrer les données sensibles
+export const tokenStorage = {
+  TOKEN_KEY: 'patrimoine_auth_token',
+  
+  setToken(token: string): void {
+    try {
+      localStorage.setItem(this.TOKEN_KEY, token);
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde du token:', error);
+    }
+  },
+
+  getToken(): string | null {
+    try {
+      return localStorage.getItem(this.TOKEN_KEY);
+    } catch (error) {
+      console.error('Erreur lors de la récupération du token:', error);
+      return null;
+    }
+  },
+
+  removeToken(): void {
+    try {
+      localStorage.removeItem(this.TOKEN_KEY);
+    } catch (error) {
+      console.error('Erreur lors de la suppression du token:', error);
+    }
+  },
+
+  hasToken(): boolean {
+    return !!this.getToken();
+  }
+};
+
+// =============================================================================
+// STORAGE GÉNÉRIQUE
+// =============================================================================
+
+interface StorageInterface {
+  get<T>(key: string): T | null;
+  set<T>(key: string, value: T, expiresIn?: number): void;
+  remove(key: string): void;
+  clear(): void;
+  exists(key: string): boolean;
+  getAll(): Record<string, any>;
+  getSize(): number;
 }
 
-// Interface pour les données avec expiration
-interface StorageData<T> {
-  value: T;
-  timestamp: number;
-  expire?: number;
-}
+class Storage implements StorageInterface {
+  private storage: globalThis.Storage;
+  private prefix: string;
 
-// Classe pour gérer le localStorage de manière sécurisée
-export class LocalStorage {
-  private static instance: LocalStorage;
-
-  private constructor() {}
-
-  public static getInstance(): LocalStorage {
-    if (!LocalStorage.instance) {
-      LocalStorage.instance = new LocalStorage();
-    }
-    return LocalStorage.instance;
+  constructor(storage: globalThis.Storage, prefix = 'patrimoine_') {
+    this.storage = storage;
+    this.prefix = prefix;
   }
 
-  // Vérifier si localStorage est disponible
-  private isAvailable(): boolean {
-    try {
-      const test = '__storage_test__';
-      localStorage.setItem(test, test);
-      localStorage.removeItem(test);
-      return true;
-    } catch {
-      return false;
-    }
+  private getKey(key: string): string {
+    return `${this.prefix}${key}`;
   }
 
-  // Encoder les données (simple base64 pour éviter les conflits)
-  private encode(data: any): string {
+  get<T>(key: string): T | null {
     try {
-      return btoa(JSON.stringify(data));
-    } catch {
-      return JSON.stringify(data);
-    }
-  }
-
-  // Décoder les données
-  private decode<T>(data: string): T | null {
-    try {
-      return JSON.parse(atob(data));
-    } catch {
-      try {
-        return JSON.parse(data);
-      } catch {
+      const item = this.storage.getItem(this.getKey(key));
+      if (item === null) return null;
+      
+      const parsed = JSON.parse(item);
+      
+      // Vérifier si l'item a une expiration
+      if (parsed.expires && Date.now() > parsed.expires) {
+        this.remove(key);
         return null;
       }
+      
+      return parsed.value !== undefined ? parsed.value : parsed;
+    } catch (error) {
+      console.error(`Erreur lors de la lecture de ${key}:`, error);
+      return null;
     }
   }
 
-  // Stocker une valeur
-  set<T>(key: string, value: T, options?: StorageOptions): boolean {
-    if (!this.isAvailable()) return false;
-
+  set<T>(key: string, value: T, expiresIn?: number): void {
     try {
-      const storageData: StorageData<T> = {
-        value,
-        timestamp: Date.now(),
-        expire: options?.expire
-      };
-
-      const encodedData = options?.encrypt ? this.encode(storageData) : JSON.stringify(storageData);
-      localStorage.setItem(key, encodedData);
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  // Récupérer une valeur
-  get<T>(key: string, defaultValue?: T): T | null {
-    if (!this.isAvailable()) return defaultValue || null;
-
-    try {
-      const item = localStorage.getItem(key);
-      if (!item) return defaultValue || null;
-
-      // Essayer de décoder (pour les données chiffrées)
-      let storageData: StorageData<T>;
-      try {
-        storageData = this.decode<StorageData<T>>(item);
-      } catch {
-        storageData = JSON.parse(item);
+      const item = expiresIn 
+        ? { value, expires: Date.now() + expiresIn }
+        : { value };
+      
+      this.storage.setItem(this.getKey(key), JSON.stringify(item));
+    } catch (error) {
+      console.error(`Erreur lors de la sauvegarde de ${key}:`, error);
+      
+      // Si erreur de quota, essayer de libérer de l'espace
+      if (error instanceof DOMException && error.code === DOMException.QUOTA_EXCEEDED_ERR) {
+        this.cleanup();
+        try {
+          const item = expiresIn 
+            ? { value, expires: Date.now() + expiresIn }
+            : { value };
+          this.storage.setItem(this.getKey(key), JSON.stringify(item));
+        } catch (retryError) {
+          console.error(`Impossible de sauvegarder ${key} même après nettoyage:`, retryError);
+        }
       }
+    }
+  }
 
-      if (!storageData) return defaultValue || null;
+  remove(key: string): void {
+    try {
+      this.storage.removeItem(this.getKey(key));
+    } catch (error) {
+      console.error(`Erreur lors de la suppression de ${key}:`, error);
+    }
+  }
 
-      // Vérifier l'expiration
-      if (storageData.expire && Date.now() - storageData.timestamp > storageData.expire) {
-        this.remove(key);
-        return defaultValue || null;
+  clear(): void {
+    try {
+      const keysToRemove: string[] = [];
+      for (let i = 0; i < this.storage.length; i++) {
+        const key = this.storage.key(i);
+        if (key && key.startsWith(this.prefix)) {
+          keysToRemove.push(key);
+        }
       }
-
-      return storageData.value;
-    } catch {
-      return defaultValue || null;
+      keysToRemove.forEach(key => this.storage.removeItem(key));
+    } catch (error) {
+      console.error('Erreur lors du nettoyage du storage:', error);
     }
   }
 
-  // Supprimer une valeur
-  remove(key: string): boolean {
-    if (!this.isAvailable()) return false;
-
-    try {
-      localStorage.removeItem(key);
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  // Vider tout le localStorage
-  clear(): boolean {
-    if (!this.isAvailable()) return false;
-
-    try {
-      localStorage.clear();
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  // Obtenir toutes les clés
-  keys(): string[] {
-    if (!this.isAvailable()) return [];
-
-    try {
-      return Object.keys(localStorage);
-    } catch {
-      return [];
-    }
-  }
-
-  // Vérifier si une clé existe
-  has(key: string): boolean {
+  exists(key: string): boolean {
     return this.get(key) !== null;
+  }
+
+  getAll(): Record<string, any> {
+    const result: Record<string, any> = {};
+    try {
+      for (let i = 0; i < this.storage.length; i++) {
+        const fullKey = this.storage.key(i);
+        if (fullKey && fullKey.startsWith(this.prefix)) {
+          const key = fullKey.substring(this.prefix.length);
+          result[key] = this.get(key);
+        }
+      }
+    } catch (error) {
+      console.error('Erreur lors de la récupération de tous les éléments:', error);
+    }
+    return result;
+  }
+
+  // Nettoyer les éléments expirés
+  private cleanup(): void {
+    const keysToRemove: string[] = [];
+    try {
+      for (let i = 0; i < this.storage.length; i++) {
+        const fullKey = this.storage.key(i);
+        if (fullKey && fullKey.startsWith(this.prefix)) {
+          const item = this.storage.getItem(fullKey);
+          if (item) {
+            try {
+              const parsed = JSON.parse(item);
+              if (parsed.expires && Date.now() > parsed.expires) {
+                keysToRemove.push(fullKey);
+              }
+            } catch {
+              // Item corrompu, le supprimer
+              keysToRemove.push(fullKey);
+            }
+          }
+        }
+      }
+      keysToRemove.forEach(key => this.storage.removeItem(key));
+    } catch (error) {
+      console.error('Erreur lors du nettoyage:', error);
+    }
   }
 
   // Obtenir la taille utilisée (approximative)
   getSize(): number {
-    if (!this.isAvailable()) return 0;
-
+    let size = 0;
     try {
-      let total = 0;
-      for (const key in localStorage) {
-        if (localStorage.hasOwnProperty(key)) {
-          total += localStorage[key].length + key.length;
+      for (let i = 0; i < this.storage.length; i++) {
+        const key = this.storage.key(i);
+        if (key && key.startsWith(this.prefix)) {
+          const item = this.storage.getItem(key);
+          if (item) {
+            size += key.length + item.length;
+          }
         }
       }
-      return total;
-    } catch {
-      return 0;
+    } catch (error) {
+      console.error('Erreur lors du calcul de la taille:', error);
     }
+    return size;
   }
 }
 
-// Classe pour gérer le sessionStorage
-export class SessionStorage {
-  private static instance: SessionStorage;
+// =============================================================================
+// INSTANCES POUR DIFFÉRENTS TYPES DE STOCKAGE
+// =============================================================================
 
-  private constructor() {}
+// Storage local persistant
+export const storage = new Storage(globalThis.localStorage, 'patrimoine_');
 
-  public static getInstance(): SessionStorage {
-    if (!SessionStorage.instance) {
-      SessionStorage.instance = new SessionStorage();
-    }
-    return SessionStorage.instance;
-  }
+// Storage de session (temporaire)
+export const sessionStorage = new Storage(globalThis.sessionStorage, 'patrimoine_session_');
 
-  private isAvailable(): boolean {
-    try {
-      const test = '__session_test__';
-      sessionStorage.setItem(test, test);
-      sessionStorage.removeItem(test);
-      return true;
-    } catch {
-      return false;
-    }
-  }
+// =============================================================================
+// CACHE INTELLIGENT POUR API
+// =============================================================================
 
-  set<T>(key: string, value: T): boolean {
-    if (!this.isAvailable()) return false;
-
-    try {
-      sessionStorage.setItem(key, JSON.stringify(value));
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  get<T>(key: string, defaultValue?: T): T | null {
-    if (!this.isAvailable()) return defaultValue || null;
-
-    try {
-      const item = sessionStorage.getItem(key);
-      return item ? JSON.parse(item) : defaultValue || null;
-    } catch {
-      return defaultValue || null;
-    }
-  }
-
-  remove(key: string): boolean {
-    if (!this.isAvailable()) return false;
-
-    try {
-      sessionStorage.removeItem(key);
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  clear(): boolean {
-    if (!this.isAvailable()) return false;
-
-    try {
-      sessionStorage.clear();
-      return true;
-    } catch {
-      return false;
-    }
-  }
+interface CacheConfig {
+  ttl?: number; // Time to live en millisecondes
+  maxSize?: number; // Taille maximale en bytes
 }
 
-// Instances globales
-export const localStorage = LocalStorage.getInstance();
-export const sessionStorage = SessionStorage.getInstance();
+class ApiCache {
+  private storage: Storage;
+  private config: Required<CacheConfig>;
 
-// Fonctions utilitaires spécifiques à l'application
-export const StorageUtils = {
-  // Gestion du thème
-  getTheme(): 'light' | 'dark' {
-    return localStorage.get<'light' | 'dark'>(STORAGE_KEYS.THEME, 'light');
-  },
+  constructor(storage: Storage, config: CacheConfig = {}) {
+    this.storage = storage;
+    this.config = {
+      ttl: config.ttl || 1000 * 60 * 15, // 15 minutes par défaut
+      maxSize: config.maxSize || 1024 * 1024 * 5, // 5MB par défaut
+    };
+  }
 
-  setTheme(theme: 'light' | 'dark'): void {
-    localStorage.set(STORAGE_KEYS.THEME, theme);
-  },
-
-  // Gestion de la langue
-  getLanguage(): string {
-    return localStorage.get<string>(STORAGE_KEYS.LANGUAGE, 'fr');
-  },
-
-  setLanguage(language: string): void {
-    localStorage.set(STORAGE_KEYS.LANGUAGE, language);
-  },
-
-  // Gestion de l'état de la sidebar
-  getSidebarCollapsed(): boolean {
-    return localStorage.get<boolean>(STORAGE_KEYS.SIDEBAR_COLLAPSED, false);
-  },
-
-  setSidebarCollapsed(collapsed: boolean): void {
-    localStorage.set(STORAGE_KEYS.SIDEBAR_COLLAPSED, collapsed);
-  },
-
-  // Gestion des filtres de recherche
-  getFilters(page: string): Record<string, any> {
-    const allFilters = localStorage.get<Record<string, any>>(STORAGE_KEYS.FILTERS, {});
-    return allFilters[page] || {};
-  },
-
-  setFilters(page: string, filters: Record<string, any>): void {
-    const allFilters = localStorage.get<Record<string, any>>(STORAGE_KEYS.FILTERS, {});
-    allFilters[page] = filters;
-    localStorage.set(STORAGE_KEYS.FILTERS, allFilters);
-  },
-
-  clearFilters(page?: string): void {
-    if (page) {
-      const allFilters = localStorage.get<Record<string, any>>(STORAGE_KEYS.FILTERS, {});
-      delete allFilters[page];
-      localStorage.set(STORAGE_KEYS.FILTERS, allFilters);
-    } else {
-      localStorage.remove(STORAGE_KEYS.FILTERS);
-    }
-  },
-
-  // Gestion des paramètres de pagination
-  getPagination(page: string): { pageSize: number; currentPage: number } {
-    const allPagination = localStorage.get<Record<string, any>>(STORAGE_KEYS.PAGINATION, {});
-    return allPagination[page] || { pageSize: 20, currentPage: 1 };
-  },
-
-  setPagination(page: string, pageSize: number, currentPage: number): void {
-    const allPagination = localStorage.get<Record<string, any>>(STORAGE_KEYS.PAGINATION, {});
-    allPagination[page] = { pageSize, currentPage };
-    localStorage.set(STORAGE_KEYS.PAGINATION, allPagination);
-  },
-
-  // Gestion des données temporaires (avec expiration automatique)
-  setTempData<T>(key: string, value: T, expireInMinutes: number = 60): void {
-    localStorage.set(key, value, { expire: expireInMinutes * 60 * 1000 });
-  },
-
-  getTempData<T>(key: string, defaultValue?: T): T | null {
-    return localStorage.get<T>(key, defaultValue);
-  },
-
-  // Nettoyage des données expirées
-  cleanExpiredData(): void {
-    const keys = localStorage.keys();
-    keys.forEach(key => {
-      // Essayer de récupérer chaque élément (cela supprimera automatiquement les éléments expirés)
-      localStorage.get(key);
-    });
-  },
-
-  // Sauvegarde des données de formulaire (pour éviter la perte de données)
-  saveFormData(formId: string, data: Record<string, any>): void {
-    const key = `form_draft_${formId}`;
-    localStorage.set(key, data, { expire: 24 * 60 * 60 * 1000 }); // 24 heures
-  },
-
-  getFormData(formId: string): Record<string, any> | null {
-    const key = `form_draft_${formId}`;
-    return localStorage.get<Record<string, any>>(key);
-  },
-
-  clearFormData(formId: string): void {
-    const key = `form_draft_${formId}`;
-    localStorage.remove(key);
-  },
-
-  // Gestion des favoris
-  getFavorites(type: string): number[] {
-    const key = `favorites_${type}`;
-    return localStorage.get<number[]>(key, []);
-  },
-
-  addToFavorites(type: string, id: number): void {
-    const favorites = this.getFavorites(type);
-    if (!favorites.includes(id)) {
-      favorites.push(id);
-      localStorage.set(`favorites_${type}`, favorites);
-    }
-  },
-
-  removeFromFavorites(type: string, id: number): void {
-    const favorites = this.getFavorites(type);
-    const updated = favorites.filter(favId => favId !== id);
-    localStorage.set(`favorites_${type}`, updated);
-  },
-
-  isFavorite(type: string, id: number): boolean {
-    const favorites = this.getFavorites(type);
-    return favorites.includes(id);
-  },
-
-  // Gestion de l'historique de recherche
-  getSearchHistory(type: string): string[] {
-    const key = `search_history_${type}`;
-    return localStorage.get<string[]>(key, []);
-  },
-
-  addToSearchHistory(type: string, query: string, maxItems: number = 10): void {
-    if (!query.trim()) return;
+  set<T>(key: string, data: T, customTtl?: number): void {
+    const ttl = customTtl || this.config.ttl;
     
-    const history = this.getSearchHistory(type);
-    const updated = [query, ...history.filter(item => item !== query)].slice(0, maxItems);
-    localStorage.set(`search_history_${type}`, updated);
-  },
-
-  clearSearchHistory(type: string): void {
-    const key = `search_history_${type}`;
-    localStorage.remove(key);
-  },
-
-  // Migration des données (pour les mises à jour)
-  migrateData(version: string): void {
-    const currentVersion = localStorage.get<string>('app_version');
-    
-    if (currentVersion !== version) {
-      // Ici on peut ajouter la logique de migration selon la version
-      console.log(`Migration des données de ${currentVersion} vers ${version}`);
-      
-      // Marquer la nouvelle version
-      localStorage.set('app_version', version);
+    // Vérifier la taille avant de sauvegarder
+    const size = JSON.stringify(data).length;
+    if (size > this.config.maxSize) {
+      console.warn(`Données trop volumineuses pour ${key}: ${size} bytes`);
+      return;
     }
-  },
 
-  // Exportation des données utilisateur
-  exportUserData(): string {
-    const userData: Record<string, any> = {};
-    const keys = localStorage.keys();
-    
-    keys.forEach(key => {
-      if (!key.startsWith('temp_') && !key.startsWith('cache_')) {
-        userData[key] = localStorage.get(key);
+    // Nettoyer le cache si nécessaire
+    if (this.storage.getSize() > this.config.maxSize) {
+      this.cleanup();
+    }
+
+    this.storage.set(key, data, ttl);
+  }
+
+  get<T>(key: string): T | null {
+    return this.storage.get<T>(key);
+  }
+
+  invalidate(pattern?: string): void {
+    if (!pattern) {
+      this.storage.clear();
+      return;
+    }
+
+    const allItems = this.storage.getAll();
+    Object.keys(allItems).forEach(key => {
+      if (key.includes(pattern)) {
+        this.storage.remove(key);
       }
     });
+  }
+
+  private cleanup(): void {
+    // Supprimer les items les plus anciens
+    const allItems = this.storage.getAll();
+    const keys = Object.keys(allItems);
     
-    return JSON.stringify(userData, null, 2);
+    // Supprimer 25% des éléments les plus anciens
+    const toRemove = Math.floor(keys.length * 0.25);
+    for (let i = 0; i < toRemove; i++) {
+      this.storage.remove(keys[i]);
+    }
+  }
+
+  getStats() {
+    return {
+      size: this.storage.getSize(),
+      maxSize: this.config.maxSize,
+      ttl: this.config.ttl,
+      items: Object.keys(this.storage.getAll()).length
+    };
+  }
+}
+
+// Instance du cache API
+export const apiCache = new ApiCache(storage, {
+  ttl: 1000 * 60 * 15, // 15 minutes
+  maxSize: 1024 * 1024 * 5 // 5MB
+});
+
+// =============================================================================
+// UTILITAIRES SPÉCIALISÉS
+// =============================================================================
+
+// Cache pour les métadonnées (plus long)
+export const metadataCache = new ApiCache(storage, {
+  ttl: 1000 * 60 * 60 * 24, // 24 heures
+  maxSize: 1024 * 1024 * 2 // 2MB
+});
+
+// Favoris utilisateur
+export const favoritesStorage = {
+  addFavorite(type: 'oeuvres' | 'evenements' | 'lieux', id: number): void {
+    const key = `favorites_${type}`;
+    const favorites = storage.get<number[]>(key) || [];
+    if (!favorites.includes(id)) {
+      favorites.push(id);
+      storage.set(key, favorites);
+    }
   },
 
-  // Importation des données utilisateur
-  importUserData(data: string): boolean {
-    try {
-      const userData = JSON.parse(data);
-      
-      Object.keys(userData).forEach(key => {
-        localStorage.set(key, userData[key]);
-      });
-      
-      return true;
-    } catch {
-      return false;
+  removeFavorite(type: 'oeuvres' | 'evenements' | 'lieux', id: number): void {
+    const key = `favorites_${type}`;
+    const favorites = storage.get<number[]>(key) || [];
+    const updated = favorites.filter(fav => fav !== id);
+    storage.set(key, updated);
+  },
+
+  getFavorites(type: 'oeuvres' | 'evenements' | 'lieux'): number[] {
+    const key = `favorites_${type}`;
+    return storage.get<number[]>(key) || [];
+  },
+
+  isFavorite(type: 'oeuvres' | 'evenements' | 'lieux', id: number): boolean {
+    return this.getFavorites(type).includes(id);
+  },
+
+  clearFavorites(type?: 'oeuvres' | 'evenements' | 'lieux'): void {
+    if (type) {
+      storage.remove(`favorites_${type}`);
+    } else {
+      storage.remove('favorites_oeuvres');
+      storage.remove('favorites_evenements');
+      storage.remove('favorites_lieux');
     }
+  }
+};
+
+// Historique de recherche
+export const searchHistory = {
+  add(query: string, type?: string): void {
+    const key = 'search_history';
+    const history = storage.get<Array<{query: string, type?: string, timestamp: number}>>(key) || [];
+    
+    // Éviter les doublons
+    const existing = history.findIndex(item => item.query === query && item.type === type);
+    if (existing !== -1) {
+      history.splice(existing, 1);
+    }
+    
+    // Ajouter en première position
+    history.unshift({ query, type, timestamp: Date.now() });
+    
+    // Limiter à 50 entrées
+    if (history.length > 50) {
+      history.splice(50);
+    }
+    
+    storage.set(key, history);
+  },
+
+  get(limit = 10): Array<{query: string, type?: string, timestamp: number}> {
+    const history = storage.get<Array<{query: string, type?: string, timestamp: number}>>('search_history') || [];
+    return history.slice(0, limit);
+  },
+
+  clear(): void {
+    storage.remove('search_history');
+  }
+};
+
+// Préférences utilisateur
+export const userPreferences = {
+  set<T>(key: string, value: T): void {
+    storage.set(`pref_${key}`, value);
+  },
+
+  get<T>(key: string, defaultValue?: T): T | null {
+    return storage.get<T>(`pref_${key}`) ?? defaultValue ?? null;
+  },
+
+  remove(key: string): void {
+    storage.remove(`pref_${key}`);
+  },
+
+  // Préférences communes
+  getLanguage(): string {
+    return this.get('language', 'fr') as string;
+  },
+
+  setLanguage(lang: string): void {
+    this.set('language', lang);
+  },
+
+  getTheme(): 'light' | 'dark' | 'auto' {
+    return this.get('theme', 'auto') as 'light' | 'dark' | 'auto';
+  },
+
+  setTheme(theme: 'light' | 'dark' | 'auto'): void {
+    this.set('theme', theme);
+  },
+
+  getItemsPerPage(): number {
+    return this.get('itemsPerPage', 12) as number;
+  },
+
+  setItemsPerPage(count: number): void {
+    this.set('itemsPerPage', count);
+  }
+};
+
+// =============================================================================
+// UTILS DEBUGGING ET MONITORING
+// =============================================================================
+
+export const storageUtils = {
+  // Obtenir des stats sur l'utilisation du storage
+  getStorageStats() {
+    return {
+      localStorage: {
+        used: storage.getSize(),
+        items: Object.keys(storage.getAll()).length
+      },
+      sessionStorage: {
+        used: sessionStorage.getSize(),
+        items: Object.keys(sessionStorage.getAll()).length
+      },
+      apiCache: apiCache.getStats(),
+      totalFavorites: Object.keys(storage.getAll()).filter(key => key.startsWith('favorites_')).length
+    };
+  },
+
+  // Nettoyer tout le cache applicatif
+  clearAllCache() {
+    apiCache.invalidate();
+    metadataCache.invalidate();
+    searchHistory.clear();
+  },
+
+  // Exporter les données utilisateur (favoris, préférences)
+  exportUserData() {
+    const data = storage.getAll();
+    const userData = Object.keys(data)
+      .filter(key => key.startsWith('favorites_') || key.startsWith('pref_'))
+      .reduce((obj, key) => {
+        obj[key] = data[key];
+        return obj;
+      }, {} as Record<string, any>);
+    
+    return {
+      exportDate: new Date().toISOString(),
+      data: userData
+    };
+  },
+
+  // Importer les données utilisateur
+  importUserData(exportedData: { data: Record<string, any> }) {
+    Object.entries(exportedData.data).forEach(([key, value]) => {
+      if (key.startsWith('favorites_') || key.startsWith('pref_')) {
+        storage.set(key, value);
+      }
+    });
   }
 };
