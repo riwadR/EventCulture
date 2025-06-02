@@ -1,93 +1,259 @@
-const express = require("express");
-const cors = require("cors");
-const helmet = require("helmet");
-const dotenv = require("dotenv");
-const sequelize = require("./config/database");
-const path = require("path");
-const findFreePort = require("find-free-port");
-const app = express();
+require('dotenv').config();
+const express = require('express');
+const helmet = require('helmet');
+const morgan = require('morgan');
+const compression = require('compression');
+const path = require('path');
 
-// Chargement des variables d'environnement
-dotenv.config();
-
-// CORS middleware first
-app.use(cors({
-  origin: ['http://localhost:' + process.env.PORT, 'https://agirvillagesaures.fr'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization', ]
-}));
-
-// Security middleware
-app.use(helmet());
-
-// Parsing middlewares - order matters
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Importation des middlewares
+const corsMiddleware = require('./middlewares/corsMiddleware');
+const rateLimitMiddleware = require('./middlewares/rateLimitMiddleware');
+const errorMiddleware = require('./middlewares/errorMiddleware');
+const createAuthMiddleware = require('./middlewares/authMiddleware');
 
 // Importation des routes
-const userRoutes = require("./routes/userRoutes");
-const catalogueRoutes = require("./routes/catalogueRoutes");
-const commentaireRoutes = require("./routes/commentaireRoutes");
-const eventRoutes = require("./routes/eventRoutes");
-const lieuRoutes = require("./routes/lieuRoutes");
-const mediaRoutes = require("./routes/mediaRoutes");
-const participantRoutes = require("./routes/participantRoutes");
-const parcoursRoutes = require("./routes/parcoursRoutes");
-const parcoursLieuxRoutes = require("./routes/parcoursLieuxRoutes");
-const programmeRoutes = require("./routes/programmeRoutes");
-const oeuvreRoutes = require("./routes/oeuvreRoutes");
-const authRoutes = require("./routes/authRoutes");
+const initRoutes = require('./routes');
 
-// Définition des routes
-app.use("/api/users", userRoutes);
-app.use("/api/events", eventRoutes);
-app.use("/api/programmes", programmeRoutes);
-app.use("/api/lieux", lieuRoutes);
-app.use("/api/catalogues", catalogueRoutes);
-app.use("/api/commentaires", commentaireRoutes);
-app.use("/api/medias", mediaRoutes);
-app.use("/api/parcours", parcoursRoutes);
-app.use("/api/parcoursLieux", parcoursLieuxRoutes);
-app.use("/api/participants", participantRoutes);
-app.use("/api/oeuvres", oeuvreRoutes);
-app.use("/api/auth", authRoutes);
+// Importation des services
+const { initializeDatabase } = require('./models');
+const emailService = require('./services/emailService');
+const uploadService = require('./services/uploadService');
 
-// Serve static files
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+class App {
+  constructor() {
+    this.app = express();
+    this.models = null;
+    this.authMiddleware = null;
+  }
 
-// Logging middleware
-app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
-  next();
-});
+  // Initialisation des middlewares de base
+  initializeMiddlewares() {
+    // Sécurité
+    this.app.use(helmet({
+      crossOriginResourcePolicy: { policy: "cross-origin" },
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          imgSrc: ["'self'", "data:", "https:"],
+          scriptSrc: ["'self'"],
+          styleSrc: ["'self'", "'unsafe-inline'"],
+        },
+      }
+    }));
 
+    // CORS
+    this.app.use(corsMiddleware);
 
-// Global error handler
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ 
-    message: 'Une erreur est survenue', 
-    error: process.env.NODE_ENV === 'production' ? 'Erreur interne du serveur' : err.message 
-  });
-});
+    // Compression
+    this.app.use(compression());
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({ message: 'Route non trouvée' });
-});
+    // Rate limiting
+    this.app.use('/api/users/login', rateLimitMiddleware.auth);
+    this.app.use('/api/users/register', rateLimitMiddleware.auth);
+    this.app.use('/api/', rateLimitMiddleware.general);
 
-// Synchronisation de la base de données
-sequelize.sync({ alter: true })
-  .then(() => console.log("Base de données synchronisée."))
-  .catch((err) => console.error("Erreur de synchronisation :", err));
+    // Logging
+    if (process.env.NODE_ENV === 'development') {
+      this.app.use(morgan('dev'));
+    } else {
+      this.app.use(morgan('combined'));
+    }
 
-// Trouver un port libre et démarrer le serveur
-findFreePort(process.env.PORT).then(([port]) => {
-  app.listen(port, () => {
-    console.log(`✅ Serveur démarré sur http://localhost:${port}`);
-  });
-}).catch(err => {
-  console.error("❌ Impossible de trouver un port libre :", err);
-});
+    // Parsing des données
+    this.app.use(express.json({ limit: '10mb' }));
+    this.app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-module.exports = app;
+    // Servir les fichiers statiques
+    this.app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+    this.app.use('/public', express.static(path.join(__dirname, 'public')));
+
+    console.log('✅ Middlewares de base initialisés');
+  }
+
+  // Initialisation de la base de données
+  async initializeDatabase() {
+    try {
+      const dbConfig = {
+        database: process.env.DB_NAME || 'actionculture',
+        username: process.env.DB_USER || 'root',
+        password: process.env.DB_PASSWORD || '',
+        host: process.env.DB_HOST || 'localhost',
+        port: parseInt(process.env.DB_PORT) || 3306,
+        dialect: process.env.DB_DIALECT || 'mysql',
+        logging: process.env.NODE_ENV === 'development' ? console.log : false
+      };
+
+      const { sequelize, models } = await initializeDatabase(dbConfig);
+      this.models = models;
+      this.sequelize = sequelize;
+
+      // Initialiser le middleware d'authentification avec les modèles
+      this.authMiddleware = createAuthMiddleware(models);
+
+      console.log('✅ Base de données initialisée');
+      return { sequelize, models };
+    } catch (error) {
+      console.error('❌ Erreur lors de l\'initialisation de la base de données:', error);
+      throw error;
+    }
+  }
+
+  // Initialisation des routes
+  initializeRoutes() {
+    if (!this.models) {
+      throw new Error('Les modèles doivent être initialisés avant les routes');
+    }
+
+    // Route racine
+    this.app.get('/', (req, res) => {
+      res.json({
+        message: 'API Action Culture - Système de gestion culturelle algérien',
+        version: '1.0.0',
+        status: 'running',
+        documentation: '/api',
+        health: '/api/health'
+      });
+    });
+
+    // Routes API
+    this.app.use('/api', initRoutes(this.models));
+
+    // Route pour upload d'images
+    this.app.post('/api/upload/image', 
+      this.authMiddleware.authenticate,
+      uploadService.uploadImage().single('image'),
+      (req, res) => {
+        try {
+          if (!req.file) {
+            return res.status(400).json({
+              success: false,
+              error: 'Aucun fichier fourni'
+            });
+          }
+
+          const fileUrl = uploadService.getFileUrl(req.file.filename);
+          
+          res.json({
+            success: true,
+            message: 'Image uploadée avec succès',
+            data: {
+              filename: req.file.filename,
+              originalName: req.file.originalname,
+              url: fileUrl,
+              size: req.file.size
+            }
+          });
+        } catch (error) {
+          console.error('Erreur lors de l\'upload:', error);
+          res.status(500).json({
+            success: false,
+            error: 'Erreur lors de l\'upload de l\'image'
+          });
+        }
+      }
+    );
+
+    // Route de recherche globale
+    this.app.get('/api/search', async (req, res) => {
+      try {
+        const { q, types, limit } = req.query;
+        
+        if (!q || q.trim().length < 2) {
+          return res.status(400).json({
+            success: false,
+            error: 'Le terme de recherche doit contenir au moins 2 caractères'
+          });
+        }
+
+        const SearchService = require('./services/searchService');
+        const searchService = new SearchService(this.models);
+        
+        const results = await searchService.globalSearch(q.trim(), {
+          types: types ? types.split(',') : undefined,
+          limit: limit ? parseInt(limit) : undefined
+        });
+
+        res.json(results);
+      } catch (error) {
+        console.error('Erreur lors de la recherche globale:', error);
+        res.status(500).json({
+          success: false,
+          error: 'Erreur lors de la recherche'
+        });
+      }
+    });
+
+    // Route pour suggestions de recherche
+    this.app.get('/api/search/suggestions', async (req, res) => {
+      try {
+        const { q, limit } = req.query;
+        
+        if (!q || q.trim().length < 1) {
+          return res.json({ success: true, suggestions: [] });
+        }
+
+        const SearchService = require('./services/searchService');
+        const searchService = new SearchService(this.models);
+        
+        const results = await searchService.getSuggestions(q.trim(), limit ? parseInt(limit) : undefined);
+
+        res.json(results);
+      } catch (error) {
+        console.error('Erreur lors de la génération de suggestions:', error);
+        res.status(500).json({
+          success: false,
+          error: 'Erreur lors de la génération de suggestions'
+        });
+      }
+    });
+
+    console.log('✅ Routes initialisées');
+  }
+
+  // Initialisation de la gestion d'erreurs
+  initializeErrorHandling() {
+    // Middleware 404
+    this.app.use(errorMiddleware.notFound);
+
+    // Gestionnaire d'erreurs global
+    this.app.use(errorMiddleware.errorHandler);
+
+    console.log('✅ Gestion d\'erreurs initialisée');
+  }
+
+  // Initialisation complète de l'application
+  async initialize() {
+    try {
+      console.log('🚀 Initialisation de l\'application Action Culture...');
+      
+      this.initializeMiddlewares();
+      await this.initializeDatabase();
+      this.initializeRoutes();
+      this.initializeErrorHandling();
+      
+      console.log('🎉 Application initialisée avec succès !');
+      return this.app;
+    } catch (error) {
+      console.error('❌ Erreur lors de l\'initialisation de l\'application:', error);
+      throw error;
+    }
+  }
+
+  // Méthodes utilitaires
+  getApp() {
+    return this.app;
+  }
+
+  getModels() {
+    return this.models;
+  }
+
+  async closeDatabase() {
+    if (this.sequelize) {
+      await this.sequelize.close();
+      console.log('🔌 Connexion à la base de données fermée');
+    }
+  }
+}
+
+module.exports = App;
