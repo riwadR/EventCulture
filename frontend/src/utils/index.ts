@@ -1,5 +1,7 @@
 // utils/index.ts - Utilitaires principaux exportés
 
+import { storage } from './storage';
+
 // =============================================================================
 // FORMATAGE ET AFFICHAGE
 // =============================================================================
@@ -186,7 +188,7 @@ export const validation = {
   },
 
   minLength(value: string, min: number): boolean {
-    return value && value.length >= min;
+    return Boolean(value) && value.length >= min;
   },
 
   maxLength(value: string, max: number): boolean {
@@ -493,6 +495,7 @@ export const utils = {
   errorHandling,
   navigation,
   algeria,
+  storage,
   
   // Alias courts pour les plus utilisés
   format: formatting,

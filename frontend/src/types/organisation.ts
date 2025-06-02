@@ -302,7 +302,7 @@ export const getUserRoleInOrganisation = (
   const membership = user.Organisations?.find(
     org => org.id_organisation === organisationId
   );
-  return membership ? membership.UserOrganisation?.role_dans_organisation || null : null;
+  return membership?.role_dans_organisation || null;
 };
 
 export const canUserManageOrganisation = (
